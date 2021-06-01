@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="img/logo.ico">
+
+    <title>Game Buddy App</title>
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- GOOGLE FONT -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Ubuntu">
+
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- FONT AWESOME -->
+    <script src="https://kit.fontawesome.com/e367b28ca4.js" crossorigin="anonymous"></script>
+    
+
+
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <a href="/"><img src="img/logo.svg" alt="Logo van Game Buddy"/></a>
+        </header>
+
+        <main>
+            <%- body %>
+        </main>
+
+        <footer>
+            <section>
+                <a href="/aanmelden"><i class="fas fa-user-plus"></i></a>
+            </section>
+            <section>
+                <a href="/"><i class="fas fa-home"></i></a>
+            </section>
+            <section>
+                <a href="/zoeken"><i class="fas fa-gamepad"></i></a>
+            </section>
+        </footer>
+    </div>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>

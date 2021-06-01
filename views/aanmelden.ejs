@@ -1,0 +1,130 @@
+<div class="hometerug">
+  <span id="terug"><a href="/"><i class="fas fa-chevron-left"></i></a></span>
+</div>
+
+<h1>Plaats je oproep</h1>
+    
+    <form method="POST" action="/aanmelden" id="gameform" enctype="multipart/form-data">
+
+        <div>
+          <section>
+            <label for="naam">Naam</label>
+            <input type="text" id="naam" name="naam" required>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="leeftijd">Leeftijd</label>
+            <input type="number" id="leeftijd" name="leeftijd" required>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="email">E-Mail</label>
+            <input type="email" id="email" name="email" required>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="phone">Telefoonnummer</label>
+            <input type="phone" id="telefoon" name="telefoon" required>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="console">Console</label>
+              <select name="console" id="console" required>
+                <option value="pc">PC</option>
+                <option value="ps4">PlayStation 4</option>
+                <option value="ps5">PlayStation 5</option>
+                <option value="xboxone">Xbox One</option>
+                <option value="xboxseriesx">Xbox Series X</option>
+              </select>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="bio">Bio</label>
+            <textarea id="bio" name="bio" rows="1" maxlength="50" required></textarea>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="game1">Game 1</label>
+              <select name="game1" id="game1" required>
+                <option value="fifa">Fifa</option>
+                <option value="cod">Call of Duty</option>
+                <option value="fortnite">Fortnite</option>
+                <option value="battlefield">Battlefield</option>
+                <option value="gta">GTA</option>
+                <option value="farcry">Farcry</option>
+                <option value="rocketleague">Rocket League</option>
+                <option value="minecraft">Minecraft</option>
+                <option value="aoe">Age of Empires</option>
+              </select>
+          </section>
+
+          <section>
+            <label for="game2">Game 2</label>
+              <select name="game2" id="game2" required>
+                <option value="fifa">Fifa</option>
+                <option value="cod">Call of Duty</option>
+                <option value="fortnite">Fortnite</option>
+                <option value="battlefield">Battlefield</option>
+                <option value="gta">GTA</option>
+                <option value="farcry">Farcry</option>
+                <option value="rocketleague">Rocket League</option>
+                <option value="minecraft">Minecraft</option>
+                <option value="aoe">Age of Empires</option>
+              </select>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="game3">Game 3</label>
+              <select name="game3" id="game3" required>
+                <option value="fifa">Fifa</option>
+                <option value="cod">Call of Duty</option>
+                <option value="fortnite">Fortnite</option>
+                <option value="battlefield">Battlefield</option>
+                <option value="gta">GTA</option>
+                <option value="farcry">Farcry</option>
+                <option value="rocketleague">Rocket League</option>
+                <option value="minecraft">Minecraft</option>
+                <option value="aoe">Age of Empires</option>
+            </select>
+          </section>
+
+          <section>
+            <label for="game4">Game 4</label>
+              <select name="game4" id="game4" required>
+                <option value="fifa">Fifa</option>
+                <option value="cod">Call of Duty</option>
+                <option value="fortnite">Fortnite</option>
+                <option value="battlefield">Battlefield</option>
+                <option value="gta">GTA</option>
+                <option value="farcry">Farcry</option>
+                <option value="rocketleague">Rocket League</option>
+                <option value="minecraft">Minecraft</option>
+                <option value="aoe">Age of Empires</option>
+              </select>
+          </section>
+        </div>
+
+        <div>
+          <section>
+            <label for="image">Profielfoto</label>
+            <input name="image" type="file" id="image" required/>
+          </section>
+        </div>
+
+        <input type="submit" value="Aanmelden">
+        
+      </form>

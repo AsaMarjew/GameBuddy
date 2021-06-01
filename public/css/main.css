@@ -1,0 +1,441 @@
+*{
+    margin: 0 auto;
+    font-family: Roboto;
+}
+
+:root{
+    --wit: #ffff;
+    --zwart: #000;
+    --grijs: #232323;
+    --lichtgrijs: #d3d3d3;
+    --geel: #fdae37;
+    --groen: #95e8b1;
+}
+
+input, select, textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+a{
+    color: var(--geel);
+}
+
+h1{
+    font-size: 1.8em;
+    text-align: center;
+    margin-bottom: 70px;
+    margin-top: 50px;
+    color: var(--wit);
+}
+
+h2{
+    font-size: 1.3em;
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 10px;
+    color: var(--wit);
+}
+
+body{
+    background-color: #dcdcdc;
+}
+
+/* APP MAX 600 PX, MOBIEL FORMAAT */
+#app{
+    max-width: 600px;
+    margin: auto;
+    background-color: var(--grijs);
+}
+
+header a{
+    padding: 10px;
+    font-size: 1.3em;
+    color: var(--wit);
+    text-decoration: none;
+}
+
+
+/* BEGIN HOME */
+.home{
+    display: grid;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.home img{
+    width: 50%;
+    height: auto;
+    margin-top: 50px;
+}
+
+.home h1{
+    color: var(--geel);
+    font-size: 1.2em;
+    margin-top: 10px;
+    margin-bottom: 80px;
+}
+
+#uitleglink{
+    margin-bottom: 80px;
+    font-size: 1.2em;
+}
+
+.home section{
+    display: grid;
+}
+
+.home section a{
+    background-color: var(--wit);
+    color: var(--zwart);
+    padding: 10px;
+    padding-left: 30px;
+    width: 280px;
+    border-radius: 25px;
+    font-size: 1em;
+    letter-spacing: 2px;
+    text-decoration: none;
+    margin-bottom: 20px;
+    text-align: initial;
+}
+
+.home p{
+    width: 70%;
+    color: var(--wit);
+    font-size: 0.8em;
+    margin-top: 100px;
+}
+/* EINDE HOME */
+
+
+/* BEGIN HEADER */
+header img{
+    height: 40px;
+    width: auto;
+    padding: 3px;
+    margin-top: 10px;
+}
+/* EINDE HEADER */
+
+
+/* BEGIN FOOTER */
+footer{
+    display: flex;
+    border-top: 1px solid var(--geel);
+    padding: 10px;
+    margin-top: 30px;
+}
+
+footer section a{
+    font-size: 2em;
+    color: var(--geel);
+}
+/* EINDE FOOTER */
+
+
+/* BEGIN REGISTREREN */
+
+#gameform div{
+    display: flex;
+}
+
+#gameform div section{
+    display: grid;
+    width: 40%;
+}
+
+#gameform div section label{   
+    font-family: Ubuntu;
+    color: var(--wit);
+    font-weight: 100;
+    margin-bottom: 2px;
+}
+
+#gameform div section input, #gameform div section select, #filteren select{   
+    width: 100%;
+    padding: 8px 2px;
+    border: 0px;
+    margin-bottom: 60px;
+    background-color: var(--grijs);
+    border-bottom: 1px solid var(--geel);
+    color: var(--wit);
+}
+
+#gameform textarea{
+    width: 100%;
+    background-color: var(--grijs);
+    border: 0px;
+    border-bottom: 1px solid var(--geel);
+    color: var(--wit);
+    margin-bottom: 100px;
+}
+
+#filteren select{
+    width: 50%;
+}
+
+#console{
+    margin-bottom: 75px !important;
+}
+
+#gameform input[type=submit]{
+    margin: auto;
+    display: flex;
+    padding: 10px 90px;
+    border-radius: 25px;
+    border: 0px;
+    background-color: var(--geel);
+    font-size: 1em;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: 30px;
+    margin-bottom: 80px;
+}
+
+/* EINDE REGISTREREN */
+
+/* BEGIN CARD */
+.card{
+    background-color: var(--wit);
+    width: 90%;
+    border-radius: 5px;
+    margin-top: 70px;
+    box-shadow: 5px 10px 18px #777;
+    display: flex;
+    text-align: center;
+}
+
+@media only screen and (max-width: 500px) {
+    .card{
+        max-height: 215px;
+    }
+}
+
+.card h2{
+    color: var(--zwart);
+}
+
+.card div:first-child{
+    margin: 0px;
+    width: 35%;
+}
+
+.card:nth-child(even) div:first-child{
+    background-color: #95e8b1;
+}
+
+.card:nth-child(odd) div:first-child{
+    background-color: #c0c0c0;
+}
+
+.card div:first-child section:first-child span{
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    color: var(--zwart);
+    margin-top: 15px;
+}
+
+.card div:first-child section:first-child span h2{
+    margin: 0px;
+    text-align: right;
+}
+
+.card div:first-child section:first-child span p{
+    margin: 0px;
+    text-align: left;
+    margin-left: 5px;
+}
+
+.card div:first-child section:nth-child(3) p{
+    padding: 0px 10px;
+}
+
+.card div:first-child img{
+    width: 110px;
+    height: 110px;
+    border-radius: 100px;
+    margin: 20px 0px;
+}
+
+.card div:last-child{
+    background-color: var(--wit);
+    margin: 0px;
+    width: 65%;
+}
+
+.card div:last-child section:nth-child(2) span{
+    display: inline-flex;
+    margin-bottom: 50px;
+}
+
+.card div:last-child section:nth-child(2) span{
+    font-size: 1.3em;
+    color: #25D366;
+}
+
+.card div:last-child section:nth-child(2) span a{
+    font-size: 0.8em;
+    margin-top: 2px;
+    margin-left: 5px;
+    color: #25D366;
+}
+
+.card div:last-child section:last-child{
+    margin-bottom: 15px;
+}
+
+.card div:last-child section:last-child img{
+    width: 20%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.card div:last-child section:first-child img{
+    width: 200px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+@media only screen and (max-width: 500px) {
+    .card div:first-child section:first-child span h2, .card div:first-child section:first-child span p{
+        font-size: 0.8em;
+    }
+
+    .card div:first-child section:nth-child(3) p{
+        font-size: 0.8em;
+    }
+
+    .card div:first-child img{
+        width: 75px;
+        height: 75px;
+    }
+
+    .card div:last-child section:first-child img{
+        width: 100px;
+        height: auto;
+    }
+}
+
+/* EINDE CARD */
+
+
+/* BEGIN ZOEKEN */
+#zoeken-menu{
+    color: var(--geel);
+    font-size: 1.5em;
+    float: right;
+    margin-top: -110px;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+#zoeken-menu span:first-child{
+    margin-right: 20px;
+}
+
+#zoeken-menu span:nth-child(2){
+    margin-right: 15px;
+}
+/* EINDE ZOEKEN */
+
+/* BEGIN FILTEREN */
+#terug{
+    margin-top: 20px;
+    margin-right: 50px;
+    display: block;
+}
+
+#filteren{
+    display: none;
+    position: fixed;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    text-align: center;
+    background-color: var(--grijs);
+    max-width: 600px;
+    height: 100%;
+}
+
+#filteren span{
+    position: absolute;
+    right: 40px;
+    top: 20px;
+    font-size: 1.8em;
+    color: var(--geel);
+    cursor: pointer;
+}
+
+#filteren div{
+    margin-top: 100px;
+}
+
+#filteren label{
+    display: block;
+    color: var(--wit);
+    margin-top: 100px;
+}
+
+#verwijderknop{
+    margin-bottom: 350px !important;
+}
+/* EINDE FILTEREN */
+
+/* BEGIN NOTFOUND */
+.notfound{
+    margin-top: 150px;
+    margin-bottom: 100px;
+}
+
+.notfound h1{
+    margin-bottom: 0px;
+    font-size: 4em;
+}
+
+.notfound h2{
+    font-size: 2em;
+    margin-bottom: 310px;
+}
+/* EINDE NOTFOUND */
+
+/* BEGIN HOEWERKTHET */
+.hoewerkhet p{
+    margin: 0 auto;
+}
+
+.hoewerkhet h1{
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+.hoewerkhet h2{
+    margin-top: 70px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.hoewerkhet a{
+    display: block;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    padding: 10px 50px;
+    border-radius: 10px;
+    background-color: var(--geel);
+    color: var(--zwart);
+    letter-spacing: 2px;
+    text-decoration: none;
+}
+
+.hometerug{
+    color: var(--geel);
+    font-size: 1.5em;
+    float: right;
+    margin-top: -110px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+/* EINDE HOEWERKTHET */

@@ -1,0 +1,74 @@
+<div id="zoeken-menu">
+    <span id="verwijderen"><a href="/verwijderen"><i class="fas fa-trash"></i></a></span>
+    <span id="instellingen"><a href="/wijzigen"><i class="fas fa-cog"></i></a></span>
+    <span id="filter"><i class="fas fa-filter"></i></span>
+</div>
+
+<%gebruikersLijst.forEach(gebruiker => {%>
+<div class="card" data-aos="fade-up">
+    <div>
+        <section>
+            <span><h2><%= gebruiker.naam %></h2> <p>(<%= gebruiker.leeftijd %>)</p></span>
+        </section>
+
+        <section>
+            <img src="/uploads/<%= gebruiker.img %>" alt="Geen gekozen profielfoto" class="avatarimg"/>
+        </section>
+
+        <section>
+            <p><%= gebruiker.bio %></p>
+        </section>
+
+    </div>
+
+
+    <div>
+        <section>
+            <img src="img/console/<%= gebruiker.console %>.svg" alt="Logo van de console" class="consoleimg"/>
+        </section>
+
+        <section>
+            <span><i class="fab fa-whatsapp-square"></i> <a href="https://wa.me/31<%= gebruiker.telefoon %>">0<%= gebruiker.telefoon %></a></span>
+        </section>
+
+        <section>
+            <img src="img/game/<%= gebruiker.game1 %>.svg" alt="Logo van de game" class="gameimg"/>
+            <img src="img/game/<%= gebruiker.game2 %>.svg" alt="Logo van de game" class="gameimg"/>
+            <img src="img/game/<%= gebruiker.game3 %>.svg" alt="Logo van de game" class="gameimg"/>
+            <img src="img/game/<%= gebruiker.game4 %>.svg" alt="Logo van de game" class="gameimg"/>
+        </section>
+
+    </div>
+
+    </div>
+
+    
+
+
+
+  
+
+          
+
+<%})%>
+
+<div id="filteren">
+    <span id="filterensluiten"><i class="fas fa-times-circle"></i></span>
+
+    <div>
+        <h1>Filteren</h1>
+        <form method="POST" action="/zoeken" id="gameform">
+            <label for="consolefilter">Console</label>
+                <select name="consolefilter" id="consolefilter">
+                    <option value="Alle">Alle</option>
+                    <option value="pc">PC</option>
+                    <option value="ps4">PlayStation 4</option>
+                    <option value="ps5">PlayStation 5</option>
+                    <option value="xboxone">Xbox One</option>
+                    <option value="xboxseriesx">Xbox Series X</option>
+                </select>
+            <input type="submit" value="Filteren">
+        </form>
+    </div>
+    
+</div>
