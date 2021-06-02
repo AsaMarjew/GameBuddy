@@ -7,59 +7,13 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 5000;
 
-// // DB setup
-// const mongo = require('mongodb');
-
-// database connect
-// let db = null;
-// let url = 'mongodb+srv://' + process.env.DB_HOST;
-
-// mongo.MongoClient.connect(
-//   url,
-//   {
-//     useUnifiedTopology: true,
-//   },
-//   function (err, client) {
-//     if (err) {
-//       throw err;
-//     }
-
-//     db = client.db(process.env.DB_NAME);
-//     console.log('Succesfully connected to MongoDB');
-//   }
-// );
-
+// DB Setup
 const { MongoClient } = require('mongodb');
-
 const uri = process.env.DB_KEY;
-
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
-
   useNewUrlParser: true,
 });
-
-function connectDB() {
-  client.connect((err, db) => {
-    if (err) throw err;
-
-    const collection = db.db('TechTeam').collection('gebruikers');
-
-    collection
-
-      .findOne({ leeftijd: 22 })
-
-      .then(res => {
-        console.log(res);
-      })
-
-      .catch(err => {
-        console.log(err);
-      });
-  });
-}
-
-connectDB();
 
 // --- Multer ---
 
@@ -134,10 +88,17 @@ app.get('/aanmelden', (req, res) => {
 
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
 app.get('/zoeken', (req, res) => {
-  gebruiker.find({}, function (err, gebruikers) {
-    res.render('zoeken', {
-      gebruikersLijst: gebruikers,
-    });
+  client.connect((err, db) => {
+    if (err) throw err;
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .find()
+      .toArray()
+      .then(gebruikers => {
+        res.render('zoeken', {
+          gebruikersLijst: gebruikers,
+        });
+      });
   });
 });
 
@@ -165,19 +126,31 @@ app.get('/error', (req, res) => {
 
 //als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
 app.post('/aanmelden', upload.single('image'), async (req, res) => {
-  console.log(request.file);
-  let nieuwGebruiker = new gebruiker({
-    naam: req.body.naam,
-    leeftijd: req.body.leeftijd,
-    email: req.body.email,
-    telefoon: req.body.telefoon,
-    console: req.body.console,
-    bio: req.body.bio,
-    game1: req.body.game1,
-    game2: req.body.game2,
-    game3: req.body.game3,
-    game4: req.body.game4,
-    img: req.file.filename,
+  //console.log(request.file);
+  client.connect((err, db) => {
+    if (err) throw err;
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .insertOne({
+        naam: req.body.naam,
+        leeftijd: req.body.leeftijd,
+        email: req.body.email,
+        telefoon: req.body.telefoon,
+        console: req.body.console,
+        bio: req.body.bio,
+        game1: req.body.game1,
+        game2: req.body.game2,
+        game3: req.body.game3,
+        game4: req.body.game4,
+        img: req.file.filename,
+      })
+      .then(() => {
+        db.close();
+        res.redirect('/zoeken');
+      })
+      .catch(err => {
+        console.log(err);
+      });
   });
 });
 
@@ -207,28 +180,56 @@ app.post('/zoeken', async (req, res) => {
   });
 });
 
+client.connect((err, db) => {
+  if (err) throw err;
+  db.db('TechTeam')
+    .collection('gebruikers')
+    .findOneAndUpdate({ naam: 'Philip' }, { $set: { naam: 'Muhammet' } })
+    .then(() => {
+      db.close();
+      //res.redirect('/zoeken');
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+
 //wijzigingen doorvoeren
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
   try {
     //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
-    const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
-    doc.overwrite({
-      naam: req.body.wijzignaam,
-      leeftijd: req.body.wijzigleeftijd,
-      email: req.body.wijzigemail,
-      telefoon: req.body.wijzigtelefoon,
-      console: req.body.wijzigconsole,
-      bio: req.body.wijzigbio,
-      game1: req.body.wijziggame1,
-      game2: req.body.wijziggame2,
-      game3: req.body.wijziggame3,
-      game4: req.body.wijziggame4,
-      img: req.file.filename,
+    client.connect((err, db) => {
+      if (err) throw err;
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .findOneAndUpdate()
+        .then(() => {
+          db.close();
+          res.redirect('/zoeken');
+        })
+        .catch(err => {
+          console.log(err);
+        });
     });
 
-    //de updates worden opgeslagen
-    await doc.save();
-    res.redirect('/zoeken');
+    // const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
+    // doc.overwrite({
+    //   naam: req.body.wijzignaam,
+    //   leeftijd: req.body.wijzigleeftijd,
+    //   email: req.body.wijzigemail,
+    //   telefoon: req.body.wijzigtelefoon,
+    //   console: req.body.wijzigconsole,
+    //   bio: req.body.wijzigbio,
+    //   game1: req.body.wijziggame1,
+    //   game2: req.body.wijziggame2,
+    //   game3: req.body.wijziggame3,
+    //   game4: req.body.wijziggame4,
+    //   img: req.file.filename,
+    // });
+
+    // //de updates worden opgeslagen
+    // await doc.save();
+    // res.redirect('/zoeken');
 
     //bij een error wordt de gebruiker doorverwezen naar de error pagina
   } catch (err) {
