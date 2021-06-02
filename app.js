@@ -7,23 +7,52 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 5000;
 
-// DB setup
+// // DB setup
+// const mongo = require('mongodb');
+
+// database connect
+// let db = null;
+// let url = 'mongodb+srv://' + process.env.DB_HOST;
+
+// mongo.MongoClient.connect(
+//   url,
+//   {
+//     useUnifiedTopology: true,
+//   },
+//   function (err, client) {
+//     if (err) {
+//       throw err;
+//     }
+
+//     db = client.db(process.env.DB_NAME);
+//     console.log('Succesfully connected to MongoDB');
+//   }
+// );
+
 const { MongoClient } = require('mongodb');
-const uri = process.env.MONGO_URI;
+
+const uri = process.env.DB_KEY;
+
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
+
   useNewUrlParser: true,
 });
 
 function connectDB() {
   client.connect((err, db) => {
     if (err) throw err;
-    const collection = db.db('Tech6').collection('saved');
+
+    const collection = db.db('TechTeam').collection('gebruikers');
+
     collection
-      .findOne({ id: 0 })
+
+      .findOne({ leeftijd: 22 })
+
       .then(res => {
-        console.log(result);
+        console.log(res);
       })
+
       .catch(err => {
         console.log(err);
       });
