@@ -1,4 +1,8 @@
+
 // test 2
+=======
+// merge test
+
 require('dotenv').config();
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
