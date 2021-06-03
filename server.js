@@ -88,7 +88,7 @@ const storage = multer.diskStorage({
   },
 });
 
-//gewijzigde afbeeldingen test
+//gewijzigde afbeeldingen testt
 const storageWijzig = multer.diskStorage({
   destination: function (request, file, callback) {
     callback(null, "./public/uploads");
