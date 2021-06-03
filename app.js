@@ -113,6 +113,11 @@ app.get('/verwijderen', (req, res) => {
   res.render('verwijderen');
 });
 
+// favorieten route
+app.get('/favorieten', (req, res) => {
+  res.render('favorieten');
+});
+
 //tutorial route
 app.get('/hoe-werkt-het', (req, res) => {
   res.render('hoewerkthet');
@@ -122,6 +127,72 @@ app.get('/hoe-werkt-het', (req, res) => {
 app.get('/error', (req, res) => {
   res.render('error');
 });
+
+// -- routing functions --
+
+function renderFavorieten() {
+  client.connect((err, db) => {
+    if (err) throw err;
+    let favorietenCol = db.db('TechTeam').collection('favorieten');
+    let gebruikersCol = db.db('TechTeam').collection('gebruikers');
+    favorietenCol.findOne({ id: 0 }).then(results => {
+      // request IDs of saved influencers => return influencer objects
+      let users = [];
+      results.opgeslagen.forEach(gebLeeftijd => {
+        users.push(gebruikersCol.findOne({ leeftijd: gebLeeftijd }));
+        //console.log(gebLeeftijd);
+      });
+      Promise.all(users)
+        .then(data => {
+          res.render('favorieten', { data: data });
+          db.close();
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    });
+  });
+}
+
+function test() {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  client.connect((err, db) => {
+    if (err) throw err;
+    let favorietenCol = db.db('TechTeam').collection('favorieten');
+    let gebruikersCol = db.db('TechTeam').collection('gebruikers');
+    favorietenCol.findOne({ id: 0 }).then(results => {
+      // request IDs of saved influencers => return influencer objects
+      let users = [];
+      results.opgeslagen.forEach(gebLeeftijd => {
+        users.push(gebruikersCol.findOne({ leeftijd: gebLeeftijd }));
+        //console.log(gebLeeftijd);
+      });
+      Promise.all(users)
+        .then(data => {
+          console.log(data);
+          db.close();
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    });
+  });
+}
+
+client.connect((err, db) => {
+  db.db('TechTeam')
+    .collection('gebruikers')
+    .findOne({ naam: 'Asa Marjew' })
+    .then(result => {
+      console.log(result);
+    });
+});
+
+//test();
 
 // --- handle post ---
 

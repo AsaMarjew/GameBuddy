@@ -1,0 +1,27 @@
+<div class="hometerug">
+  <span id="terug"
+    ><a href="/"><i class="fas fa-chevron-left"></i></a
+  ></span>
+</div>
+
+<h1>Opgeslagen</h1>
+
+<div class="cardContainer">
+  <% data.forEach( user => { %>
+  <div class="userCard">
+    <a href="/influencers/<%- user.id %>">
+      <div class="imgCont"><img src="/<%- user.fotos[0] %>" /></div>
+      <h3><%- user.naam %></h3>
+      <ul>
+        <li>Doelgroep: <%- user.doelgroep %></li>
+        <li>Platformen: <%- user.platformen %></li>
+        <li>Volgers: <%- user.volgers %></li>
+      </ul>
+    </a>
+    <form method="post" action="/opgeslagen">
+      <input type="hidden" value="<%- user.id %>" name="infID" />
+      <input type="submit" value="Verwijder" />
+    </form>
+  </div>
+  <% }) %>
+</div>
