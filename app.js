@@ -15,6 +15,24 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
 });
 
+// Is er db connectie?
+function test() {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+  client.connect((err, db) => {
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOne({ naam: 'Asa Marjew' })
+      .then(result => {
+        console.log(result);
+      });
+  });
+}
+
+test();
+
 // --- Multer ---
 
 //afbeeldingen worden opgeslagen in de public/uploads map
