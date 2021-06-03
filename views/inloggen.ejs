@@ -1,0 +1,35 @@
+<div class="hometerug">
+  <span id="terug"
+    ><a href="/"><i class="fas fa-chevron-left"></i></a
+  ></span>
+</div>
+
+<h1>Log in</h1>
+
+<form
+  method="POST"
+  action="/inloggen"
+  id="inlog-form"
+  enctype="multipart/form-data"
+>
+  <div>
+    <section>
+      <label for="email-inloggen">E-Mail</label>
+      <input type="email" id="email" name="email-inloggen" required />
+    </section>
+  </div>
+
+  <div>
+    <section>
+      <label for="wachtwoord-inloggen">Wachtwoord</label>
+      <input
+        type="password"
+        id="password"
+        name="wachtwoord-inloggen"
+        required
+      />
+    </section>
+  </div>
+
+  <input type="submit" value="Inloggen" />
+</form>
