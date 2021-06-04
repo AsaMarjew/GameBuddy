@@ -15,7 +15,7 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
 });
 
-// Is er db connectie?
+// Checken of er db connectie is
 function test() {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
