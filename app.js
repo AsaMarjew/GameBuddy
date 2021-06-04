@@ -114,9 +114,7 @@ app.get('/verwijderen', (req, res) => {
 });
 
 // favorieten route
-app.get('/favorieten', (req, res) => {
-  res.render('favorieten');
-});
+app.get('/favorieten', renderFavorieten);
 
 //tutorial route
 app.get('/hoe-werkt-het', (req, res) => {
@@ -130,7 +128,12 @@ app.get('/error', (req, res) => {
 
 // -- routing functions --
 
-function renderFavorieten() {
+function renderFavorieten(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
   client.connect((err, db) => {
     if (err) throw err;
     let favorietenCol = db.db('TechTeam').collection('favorieten');
@@ -144,7 +147,7 @@ function renderFavorieten() {
       });
       Promise.all(users)
         .then(data => {
-          res.render('favorieten', { data: data });
+          res.render('favorieten', { gebruikersLijst: data });
           db.close();
         })
         .catch(err => {
@@ -182,15 +185,6 @@ function test() {
     });
   });
 }
-
-client.connect((err, db) => {
-  db.db('TechTeam')
-    .collection('gebruikers')
-    .findOne({ naam: 'Asa Marjew' })
-    .then(result => {
-      console.log(result);
-    });
-});
 
 //test();
 

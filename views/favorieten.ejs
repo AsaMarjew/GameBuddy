@@ -4,24 +4,43 @@
   ></span>
 </div>
 
-<h1>Opgeslagen</h1>
+<h1>Favorieten</h1>
 
-<div class="cardContainer">
-  <% data.forEach( user => { %>
-  <div class="userCard">
-    <a href="/influencers/<%- user.id %>">
-      <div class="imgCont"><img src="/<%- user.fotos[0] %>" /></div>
-      <h3><%- user.naam %></h3>
-      <ul>
-        <li>Doelgroep: <%- user.doelgroep %></li>
-        <li>Platformen: <%- user.platformen %></li>
-        <li>Volgers: <%- user.volgers %></li>
-      </ul>
-    </a>
-    <form method="post" action="/opgeslagen">
-      <input type="hidden" value="<%- user.id %>" name="infID" />
-      <input type="submit" value="Verwijder" />
-    </form>
-  </div>
-  <% }) %>
-</div>
+<%gebruikersLijst.forEach(gebruiker => {%>
+<div class="card" data-aos="fade-up">
+    <div>
+        <section>
+            <span><h2><%= gebruiker.naam %></h2> <p>(<%= gebruiker.leeftijd %>)</p></span>
+        </section>
+
+        <section>
+            <img src="/uploads/<%= gebruiker.img %>" alt="Geen gekozen profielfoto" class="avatarimg"/>
+        </section>
+
+        <section>
+            <p><%= gebruiker.bio %></p>
+        </section>
+
+    </div>
+
+
+    <div>
+        <section>
+            <img src="img/console/<%= gebruiker.console %>.svg" alt="Logo van de console" class="consoleimg"/>
+        </section>
+
+        <section>
+            <span><i class="fab fa-whatsapp-square"></i> <a href="https://wa.me/31<%= gebruiker.telefoon %>">0<%= gebruiker.telefoon %></a></span>
+        </section>
+
+        <section>
+            <img src="img/game/<%= gebruiker.game1 %>.svg" alt="Logo van de game" class="gameimg"/>
+            <img src="img/game/<%= gebruiker.game2 %>.svg" alt="Logo van de game" class="gameimg"/>
+            <img src="img/game/<%= gebruiker.game3 %>.svg" alt="Logo van de game" class="gameimg"/>
+            <img src="img/game/<%= gebruiker.game4 %>.svg" alt="Logo van de game" class="gameimg"/>
+        </section>
+
+    </div>
+
+    </div>
+<%})%>
