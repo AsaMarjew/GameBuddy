@@ -1,13 +1,13 @@
+// Ophalen van de dingen die we nodig hebben
 require('dotenv').config();
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-
 const app = express();
 const port = process.env.PORT || 5000;
 
-// DB Setup
+// Database Setup
 const { MongoClient } = require('mongodb');
 const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {
@@ -15,27 +15,27 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
 });
 
-// Checken of er db connectie is
-function test() {
-  const client = new MongoClient(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
-  client.connect((err, db) => {
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .findOne({ naam: 'Asa Marjew' })
-      .then(result => {
-        console.log(result);
-      });
-  });
-}
+// TEST Checken of er database connectie is
+// function test() {
+//   const client = new MongoClient(uri, {
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true,
+//   });
+//   client.connect((err, db) => {
+//     db.db('TechTeam')
+//       .collection('gebruikers')
+//       .findOne({ naam: 'Asa Marjew' })
+//       .then(result => {
+//         console.log(result);
+//       });
+//   });
+// }
 
-test();
+// test();
 
 // --- Multer ---
 
-//afbeeldingen worden opgeslagen in de public/uploads map
+// Afbeeldingen worden opgeslagen in de public/uploads map
 const storage = multer.diskStorage({
   destination: function (request, file, callback) {
     callback(null, './public/uploads');
@@ -47,7 +47,7 @@ const storage = multer.diskStorage({
   },
 });
 
-//gewijzigde afbeeldingen
+// Gewijzigde afbeeldingen worden bijgehouden
 const storageWijzig = multer.diskStorage({
   destination: function (request, file, callback) {
     callback(null, './public/uploads');
@@ -58,7 +58,7 @@ const storageWijzig = multer.diskStorage({
   },
 });
 
-//uploaden en formaat limiet
+// Uploaden van afbeelding en checken op de formaat limiet
 const upload = multer({
   storage: storage,
   limits: {
@@ -66,7 +66,7 @@ const upload = multer({
   },
 });
 
-//gewijzigde afbeeldingen
+// Gewijzigde afbeeldingen uploaden
 const uploadWijzig = multer({
   storage: storageWijzig,
   limits: {
@@ -74,37 +74,37 @@ const uploadWijzig = multer({
   },
 });
 
-//de css, img en js map in de public map gebruiken
+// Hier worden de css, img en js map uit de public map gedefinieerd
 app.use(express.static('public'));
 app.use('/css', express.static(__dirname + 'public.css'));
 app.use('/img', express.static(__dirname + 'public.img'));
 app.use('/js', express.static(__dirname + 'public.js'));
 
-//express layout mobiel formaat en ejs gebruiken
+// Hier wordt express layout mobiel formaat gebruiken
 app.use(expressLayouts);
 app.set('layout', './layouts/mobiel-formaat');
+
+// View engine wordt op ejs gezet
 app.set('view engine', 'ejs');
 
-//bodyparser en express.json voor http requests
+// Bodyparser en express.json voor http requests
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// database connectie mongo-db
-
 // --- routing ---
 
-// render index
+// Weergave van de pagina index
 app.get('', (req, res) => {
   res.render('index');
 });
 
-//aanmelden route
+// Weergave van de pagina aanmelden
 app.get('/aanmelden', (req, res) => {
   res.render('aanmelden');
 });
 
-//zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
+// Weergave van de pagina zoeken met de gebruikers/oproepen, die meegestuurd worden vanuit de database
 app.get('/zoeken', (req, res) => {
   client.connect((err, db) => {
     if (err) throw err;
@@ -120,31 +120,30 @@ app.get('/zoeken', (req, res) => {
   });
 });
 
-//wijzigen route
+// Weergave van de pagina wijzigen
 app.get('/wijzigen', (req, res) => {
   res.render('wijzigen');
 });
 
-//verwijderen route
+// Weergave van de pagina verwijderen
 app.get('/verwijderen', (req, res) => {
   res.render('verwijderen');
 });
 
-//tutorial route
+// Weergave van de tutorial pagina
 app.get('/hoe-werkt-het', (req, res) => {
   res.render('hoewerkthet');
 });
 
-//error route
+// Weergave van de error pagina
 app.get('/error', (req, res) => {
   res.render('error');
 });
 
 // --- handle post ---
 
-//als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
+// Wanneer er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
 app.post('/aanmelden', upload.single('image'), async (req, res) => {
-  //console.log(request.file);
   client.connect((err, db) => {
     if (err) throw err;
     db.db('TechTeam')
@@ -172,45 +171,45 @@ app.post('/aanmelden', upload.single('image'), async (req, res) => {
   });
 });
 
-//filter optie
+// Filter optie
 app.post('/zoeken', async (req, res) => {
   const consoleFilter = req.body.consolefilter;
-  //lege query voor als alle aangevingt is
+  // Een lege query voor als alles aangevingt is
   let query = {};
 
   if (consoleFilter === 'Alle') {
     query = {};
 
-    //query met de gekozen fitler optie uit de dropdown in de filter menu
+    // De query met de gekozen fitler optie uit de dropdown in het filter menu
   } else {
     query = {
       console: consoleFilter,
     };
   }
 
-  //lean zet het om in mongo objecten
+  // Lean zet de query om in Mongo objecten
   const gebruikers = await gebruiker.find(query).lean();
 
-  //gebruikerslijst sturen en de filter optie
+  // De gebruikerslijst en de filter opties worden meegestuurd
   res.render('zoeken', {
     gebruikersLijst: gebruikers,
     consoleFilter,
   });
 });
 
-client.connect((err, db) => {
-  if (err) throw err;
-  db.db('TechTeam')
-    .collection('gebruikers')
-    .findOneAndUpdate({ naam: 'Philip' }, { $set: { naam: 'Muhammet' } })
-    .then(() => {
-      db.close();
-      //res.redirect('/zoeken');
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
+// client.connect((err, db) => {
+//   if (err) throw err;
+//   db.db('TechTeam')
+//     .collection('gebruikers')
+//     .findOneAndUpdate({ naam: 'Philip' }, { $set: { naam: 'Muhammet' } })
+//     .then(() => {
+//       db.close();
+//       //res.redirect('/zoeken');
+//     })
+//     .catch(err => {
+//       console.log(err);
+//     });
+// });
 
 //wijzigingen doorvoeren
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
@@ -256,17 +255,27 @@ app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
   }
 });
 
-//met deletemany worden alle records van de object verwijderd, aan de hand van de email
-app.post('/verwijderen', async (req, res) => {
-  try {
-    await gebruiker.deleteMany({
-      email: req.body.verwijderemail,
-    });
-    res.redirect('/zoeken');
-  } catch (err) {
-    res.redirect('/error');
-  }
-});
+/*  Met de functie verwijderen worden documenten verwijderd uit de database.
+    Dit wordt gedaan met deleteMany waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
+function verwijderen() {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  app.post('/verwijderen', async (req, res) => {
+    try {
+      await gebruiker.deleteMany({
+        email: req.body.verwijderemail,
+      });
+      res.redirect('/zoeken');
+    } catch (err) {
+      res.redirect('/error');
+    }
+  });
+}
+
+verwijderen();
 
 //404
 app.use(function (req, res) {
