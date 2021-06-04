@@ -89,6 +89,11 @@ app.get('/aanmelden', (req, res) => {
 
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
 app.get('/zoeken', (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
   client.connect((err, db) => {
     if (err) throw err;
     db.db('TechTeam')
@@ -126,6 +131,12 @@ app.get('/error', (req, res) => {
   res.render('error');
 });
 
+// --- post ---
+
+// favorieten post
+app.post('/zoeken', handleFavorieten);
+app.post('/favorieten', handleFavorietenVerwijderen);
+
 // -- routing functions --
 
 function renderFavorieten(req, res) {
@@ -141,9 +152,8 @@ function renderFavorieten(req, res) {
     favorietenCol.findOne({ id: 0 }).then(results => {
       // request IDs of saved influencers => return influencer objects
       let users = [];
-      results.opgeslagen.forEach(gebLeeftijd => {
-        users.push(gebruikersCol.findOne({ leeftijd: gebLeeftijd }));
-        //console.log(gebLeeftijd);
+      results.opgeslagen.forEach(gebNaam => {
+        users.push(gebruikersCol.findOne({ naam: gebNaam }));
       });
       Promise.all(users)
         .then(data => {
@@ -157,38 +167,51 @@ function renderFavorieten(req, res) {
   });
 }
 
-function test() {
+// -- post functions --
+
+function handleFavorieten(req, res) {
+  // reinstantiate client to prevent closed topology error
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
 
-  client.connect((err, db) => {
+  let gebNaam = req.body.gebruikerNaam;
+  client.connect(function (err, db) {
     if (err) throw err;
     let favorietenCol = db.db('TechTeam').collection('favorieten');
-    let gebruikersCol = db.db('TechTeam').collection('gebruikers');
-    favorietenCol.findOne({ id: 0 }).then(results => {
-      // request IDs of saved influencers => return influencer objects
-      let users = [];
-      results.opgeslagen.forEach(gebLeeftijd => {
-        users.push(gebruikersCol.findOne({ leeftijd: gebLeeftijd }));
-        //console.log(gebLeeftijd);
+    favorietenCol
+      .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebNaam } })
+      .then(() => {
+        db.close();
       });
-      Promise.all(users)
-        .then(data => {
-          console.log(data);
-          db.close();
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    });
   });
+  setTimeout(() => {
+    res.redirect('back');
+  }, 70);
 }
 
-//test();
+function handleFavorietenVerwijderen(req, res) {
+  // reinstantiate client to prevent closed topology error
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
 
-// --- handle post ---
+  let gebNaam = req.body.gebruikerNaam;
+  client.connect(function (err, db) {
+    if (err) throw err;
+    let favorietenCol = db.db('TechTeam').collection('favorieten');
+    favorietenCol
+      .findOneAndUpdate({ id: 0 }, { $pull: { opgeslagen: gebNaam } })
+      .then(() => {
+        db.close();
+      });
+  });
+  setTimeout(() => {
+    res.redirect('back');
+  }, 70);
+}
 
 //als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
 app.post('/aanmelden', upload.single('image'), async (req, res) => {
@@ -244,20 +267,6 @@ app.post('/zoeken', async (req, res) => {
     gebruikersLijst: gebruikers,
     consoleFilter,
   });
-});
-
-client.connect((err, db) => {
-  if (err) throw err;
-  db.db('TechTeam')
-    .collection('gebruikers')
-    .findOneAndUpdate({ naam: 'Philip' }, { $set: { naam: 'Muhammet' } })
-    .then(() => {
-      db.close();
-      //res.redirect('/zoeken');
-    })
-    .catch(err => {
-      console.log(err);
-    });
 });
 
 //wijzigingen doorvoeren

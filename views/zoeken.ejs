@@ -19,6 +19,14 @@
             <p><%= gebruiker.bio %></p>
         </section>
 
+        <section>
+            <form method="post" action="/zoeken">
+					<input type="hidden" value="<%- gebruiker.naam %>" name="gebruikerNaam">
+					<input type="submit" class="favorietenButton" value="" />
+                    <i class="fas fa-heart"></i>
+			</form>
+        </section>
+
     </div>
 
 
