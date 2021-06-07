@@ -88,27 +88,27 @@ app.get('/aanmelden', (req, res) => {
 });
 
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
-app.get('/zoeken', (req, res) => {
-  const client = new MongoClient(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
+// app.get('/zoeken', (req, res) => {
+//   const client = new MongoClient(uri, {
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true,
+//   });
 
-  client.connect((err, db) => {
-    if (err) throw err;
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .find()
-      .toArray()
-      .then(gebruikers => {
-        res.render('zoeken', {
-          gebruikersLijst: gebruikers,
-        });
-      });
-  });
-});
+//   client.connect((err, db) => {
+//     if (err) throw err;
+//     db.db('TechTeam')
+//       .collection('gebruikers')
+//       .find()
+//       .toArray()
+//       .then(gebruikers => {
+//         res.render('zoeken', {
+//           gebruikersLijst: gebruikers,
+//         });
+//       });
+//   });
+// });
 
-//app.get('/zoeken', renderZoeken);
+app.get('/zoeken', renderZoeken);
 
 //wijzigen route
 app.get('/wijzigen', (req, res) => {
@@ -141,29 +141,38 @@ app.post('/favorieten', handleFavorietenVerwijderen);
 
 // -- routing functions --
 
-function renderZoeken(req, res) {
+async function renderZoeken(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
 
-  client.connect((err, db) => {
+  client.connect(async (err, db) => {
     if (err) throw err;
+
     const gebruikersCol = db.db('TechTeam').collection('gebruikers');
     const favorietenCol = db.db('TechTeam').collection('favorieten');
-    let users = gebruikersCol.find().toArray();
-    let undiscoveredUsers = users.then(gebruikers => {
-      gebruikers.filter(gebruiker => {
-        favorietenCol.findOne({ id: 0 }).then(favorieten => {
-          !favorieten.opgeslagen.includes(gebruiker.naam);
-        });
-      });
+
+    let users = await gebruikersCol.find().toArray();
+    const favorites = await favorietenCol.findOne({ id: 0 });
+
+    let undiscoveredUsers = users.filter(gebruiker => {
+      return !favorites.opgeslagen.includes(gebruiker.naam);
     });
-    undiscoveredUsers.then(data => {
-      res.render('zoeken', { gebruikersLijst: data });
-    });
+
+    res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
   });
 }
+
+function test() {
+  const team = ['Philip', 'Muhammet', 'Asa', 'Kiara'];
+  let teamA = team.filter(naam => {
+    return naam.includes('a');
+  });
+  console.log(teamA);
+}
+
+test();
 
 // function renderZoeken(req, res) {
 //   const client = new MongoClient(uri, {
