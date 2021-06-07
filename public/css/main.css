@@ -24,6 +24,10 @@ a {
   color: var(--geel);
 }
 
+p {
+  color: white;
+}
+
 svg:hover {
   transition: 0.3s;
   font-size: 1.2em;
@@ -47,6 +51,10 @@ h2 {
 
 body {
   background-color: #dcdcdc;
+}
+
+main {
+  text-align: center;
 }
 
 /* APP MAX 600 PX, MOBIEL FORMAAT */
@@ -129,16 +137,22 @@ footer {
   border-top: 1px solid var(--geel);
   padding: 10px;
   margin-top: 30px;
+  height: 38px;
 }
 
 footer section {
   flex-basis: 25%;
   text-align: center;
+  position: relative;
 }
 
 footer section a {
   font-size: 2em;
   color: var(--geel);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 footer section svg {
@@ -316,6 +330,7 @@ footer section svg {
   position: relative;
   width: 50px;
   height: 50px;
+  margin: 15px auto;
 }
 
 .card .favorietenButton {
@@ -346,6 +361,22 @@ footer section svg {
   font-size: 30px;
   pointer-events: none;
   transition: 0.3s;
+}
+
+.big {
+  font-size: 1.3em;
+  margin-bottom: 15px;
+}
+
+.empty {
+  font-size: 12em;
+  color: var(--geel);
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.empty:hover {
+  font-size: 12em;
 }
 
 @media only screen and (max-width: 500px) {

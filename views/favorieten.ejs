@@ -6,7 +6,10 @@
 
 <h1>Favorieten</h1>
 
-<%gebruikersLijst.forEach(gebruiker => {%>
+<%
+    if(gebruikersLijst.length > 0) {
+        gebruikersLijst.forEach(gebruiker => {
+    %>
 <div class="card" data-aos="fade-up">
     <div>
         <section>
@@ -50,4 +53,8 @@
     </div>
 
     </div>
-<%})%>
+<%})} else { %>
+    <p class="big">Het lijkt erop dat je nog geen favorieten hebt.</p>
+    <i class="empty fas fa-heart-broken"></i>
+    <p>Ga naar <a href="/zoeken">zoeken</a> om vrienden te maken!</p>
+<% } %>
