@@ -87,27 +87,7 @@ app.get('/aanmelden', (req, res) => {
   res.render('aanmelden');
 });
 
-//zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
-// app.get('/zoeken', (req, res) => {
-//   const client = new MongoClient(uri, {
-//     useUnifiedTopology: true,
-//     useNewUrlParser: true,
-//   });
-
-//   client.connect((err, db) => {
-//     if (err) throw err;
-//     db.db('TechTeam')
-//       .collection('gebruikers')
-//       .find()
-//       .toArray()
-//       .then(gebruikers => {
-//         res.render('zoeken', {
-//           gebruikersLijst: gebruikers,
-//         });
-//       });
-//   });
-// });
-
+//zoeken route
 app.get('/zoeken', renderZoeken);
 
 //wijzigen route
@@ -142,68 +122,34 @@ app.post('/favorieten', handleFavorietenVerwijderen);
 // -- routing functions --
 
 async function renderZoeken(req, res) {
-  const client = new MongoClient(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
-
-  client.connect(async (err, db) => {
-    if (err) throw err;
-
-    const gebruikersCol = db.db('TechTeam').collection('gebruikers');
-    const favorietenCol = db.db('TechTeam').collection('favorieten');
-
-    let users = await gebruikersCol.find().toArray();
-    const favorites = await favorietenCol.findOne({ id: 0 });
-
-    let undiscoveredUsers = users.filter(gebruiker => {
-      return !favorites.opgeslagen.includes(gebruiker.naam);
+  try {
+    const client = new MongoClient(uri, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
     });
 
-    res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
-  });
+    client.connect(async (err, db) => {
+      if (err) throw err;
+
+      const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+      const favorietenCol = db.db('TechTeam').collection('favorieten');
+
+      // haal alle gebruikers op en opgeslagen gebruikers
+      let users = await gebruikersCol.find().toArray();
+      const favorites = await favorietenCol.findOne({ id: 0 });
+
+      // maak nieuwe array waar opgeslagen gebruikers niet instaan
+      let undiscoveredUsers = users.filter(gebruiker => {
+        return !favorites.opgeslagen.includes(gebruiker.naam);
+      });
+
+      res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
+      db.close();
+    });
+  } catch (err) {
+    console.log(err);
+  }
 }
-
-function test() {
-  const team = ['Philip', 'Muhammet', 'Asa', 'Kiara'];
-  let teamA = team.filter(naam => {
-    return naam.includes('a');
-  });
-  console.log(teamA);
-}
-
-test();
-
-// function renderZoeken(req, res) {
-//   const client = new MongoClient(uri, {
-//     useUnifiedTopology: true,
-//     useNewUrlParser: true,
-//   });
-
-//   client.connect((err, db) => {
-//     if (err) throw err;
-//     const gebruikersCol = db.db('TechTeam').collection('gebruikers');
-//     const favorietenCol = db.db('TechTeam').collection('favorieten');
-//     gebruikersCol
-//       .find()
-//       .toArray()
-//       .then(gebruikers => {
-//         let undiscoveredUsers = [];
-//         gebruikers.forEach(gebruiker => {
-//           favorietenCol.findOne({ id: 0 }).then(results => {
-//             if (!results.opgeslagen.includes(gebruiker.naam)) {
-//               undiscoveredUsers.push(gebruiker);
-//             }
-//           });
-//         });
-//         Promise.all(undiscoveredUsers).then(data => {
-//           //console.log(data);
-//           res.render('zoeken', { gebruikersLijst: data });
-//           //db.close();
-//         });
-//       });
-//   });
-// }
 
 function renderFavorieten(req, res) {
   const client = new MongoClient(uri, {
@@ -213,14 +159,18 @@ function renderFavorieten(req, res) {
 
   client.connect((err, db) => {
     if (err) throw err;
+
     let favorietenCol = db.db('TechTeam').collection('favorieten');
     let gebruikersCol = db.db('TechTeam').collection('gebruikers');
+
     favorietenCol.findOne({ id: 0 }).then(results => {
-      // request IDs of saved influencers => return influencer objects
+      // haal IDs van opgeslagen gebruikers op => geef hele object terug
       let users = [];
       results.opgeslagen.forEach(gebNaam => {
         users.push(gebruikersCol.findOne({ naam: gebNaam }));
       });
+
+      // nadat alle gebruikers in de user array zitten => render pagina
       Promise.all(users)
         .then(data => {
           res.render('favorieten', { gebruikersLijst: data });
@@ -242,6 +192,7 @@ function handleFavorieten(req, res) {
     useNewUrlParser: true,
   });
 
+  // voeg gebruikers ID aan favorieten toe
   let gebNaam = req.body.gebruikerNaam;
   client.connect(function (err, db) {
     if (err) throw err;
@@ -264,6 +215,7 @@ function handleFavorietenVerwijderen(req, res) {
     useNewUrlParser: true,
   });
 
+  // verwijder gebruikers ID van favorieten
   let gebNaam = req.body.gebruikerNaam;
   client.connect(function (err, db) {
     if (err) throw err;
