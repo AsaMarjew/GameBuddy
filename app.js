@@ -17,14 +17,6 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
 });
 
-// --- API ---
-fetch("https://www.easports.com/fifa/ultimate-team/api/fut/item/")
-  .then((res) => res.json())
-  .then((json) => {
-    console.log("user in the array:");
-    console.log(json.items.nation);
-  });
-
 // --- Multer ---
 
 //afbeeldingen worden opgeslagen in de public/uploads map
@@ -125,6 +117,66 @@ app.get("/verwijderen", (req, res) => {
 //tutorial route
 app.get("/hoe-werkt-het", (req, res) => {
   res.render("hoewerkthet");
+});
+
+//fortnie route
+app.get("/fortnite", async (req, res) => {
+  // --- fortnite API ---
+  const fortniteApi = await fetch(
+    "https://fortnite-api.theapinetwork.com/items/list"
+  )
+    .then((res) => res.json())
+    .then((json) => {
+      console.log("test");
+
+      //GEGEVENS 0
+      const naam0 = json.data[3].item.name;
+      const desc0 = json.data[3].item.description;
+      const type0 = json.data[3].item.type;
+      const img0 = json.data[3].item.images.background;
+      var array0 = [naam0, desc0, type0];
+
+      //GEGEVENS 1
+      const naam1 = json.data[5].item.name;
+      const desc1 = json.data[5].item.description;
+      const type1 = json.data[5].item.type;
+      const img1 = json.data[5].item.images.background;
+      var array1 = [naam1, desc1, type1];
+
+      //GEGEVENS 2
+      const naam2 = json.data[6].item.name;
+      const desc2 = json.data[6].item.description;
+      const type2 = json.data[6].item.type;
+      const img2 = json.data[6].item.images.background;
+      var array2 = [naam2, desc2, type2];
+
+      //GEGEVENS 3
+      const naam3 = json.data[10].item.name;
+      const desc3 = json.data[10].item.description;
+      const type3 = json.data[10].item.type;
+      const img3 = json.data[10].item.images.background;
+      var array3 = [naam3, desc3, type3];
+
+      //GEGEVENS 4
+      const naam4 = json.data[12].item.name;
+      const desc4 = json.data[12].item.description;
+      const type4 = json.data[12].item.type;
+      const img4 = json.data[12].item.images.background;
+      var array4 = [naam4, desc4, type4];
+
+      res.render("fortnite", {
+        array0: array0,
+        img0: img0,
+        array1: array1,
+        img1: img1,
+        array2: array2,
+        img2: img2,
+        array3: array3,
+        img3: img3,
+        array4: array4,
+        img4: img4,
+      });
+    });
 });
 
 //error route
