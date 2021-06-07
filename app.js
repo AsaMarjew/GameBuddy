@@ -4,6 +4,7 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -13,6 +14,15 @@ const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
+});
+
+// Nodemailer setup. Inloggen op het adres waar emails naar verzonden worden
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'gamebuddyteamtech@gmail.com',
+    pass: 'teamtech123',
+  },
 });
 
 // TEST Checken of er database connectie is
@@ -211,7 +221,7 @@ app.post('/zoeken', async (req, res) => {
 //     });
 // });
 
-//wijzigingen doorvoeren
+// Wijzigingen doorvoeren
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
   try {
     //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
@@ -229,26 +239,26 @@ app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
         });
     });
 
-    // const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
-    // doc.overwrite({
-    //   naam: req.body.wijzignaam,
-    //   leeftijd: req.body.wijzigleeftijd,
-    //   email: req.body.wijzigemail,
-    //   telefoon: req.body.wijzigtelefoon,
-    //   console: req.body.wijzigconsole,
-    //   bio: req.body.wijzigbio,
-    //   game1: req.body.wijziggame1,
-    //   game2: req.body.wijziggame2,
-    //   game3: req.body.wijziggame3,
-    //   game4: req.body.wijziggame4,
-    //   img: req.file.filename,
-    // });
+    const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
+    doc.overwrite({
+      naam: req.body.wijzignaam,
+      leeftijd: req.body.wijzigleeftijd,
+      email: req.body.wijzigemail,
+      telefoon: req.body.wijzigtelefoon,
+      console: req.body.wijzigconsole,
+      bio: req.body.wijzigbio,
+      game1: req.body.wijziggame1,
+      game2: req.body.wijziggame2,
+      game3: req.body.wijziggame3,
+      game4: req.body.wijziggame4,
+      img: req.file.filename,
+    });
 
-    // //de updates worden opgeslagen
-    // await doc.save();
-    // res.redirect('/zoeken');
+    // de updates worden opgeslagen
+    await doc.save();
+    res.redirect('/zoeken');
 
-    //bij een error wordt de gebruiker doorverwezen naar de error pagina
+    // Bij een error wordt de gebruiker doorverwezen naar de error pagina
   } catch (err) {
     console.log(err);
     res.redirect('/error');
@@ -257,32 +267,49 @@ app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
 
 /*  Met de functie verwijderen worden documenten verwijderd uit de database.
     Dit wordt gedaan met deleteMany waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
-function verwijderen() {
+app.post('/verwijderen', verwijderen);
+
+function verwijderen(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
 
-  app.post('/verwijderen', async (req, res) => {
-    try {
-      await gebruiker.deleteMany({
-        email: req.body.verwijderemail,
+  const email = req.body.verwijderemail;
+
+  client.connect((err, db) => {
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOneAndDelete({ email: email })
+      .then(result => {
+        console.log(result);
       });
-      res.redirect('/zoeken');
-    } catch (err) {
-      res.redirect('/error');
-    }
+
+    res.redirect('/zoeken');
   });
 }
 
-verwijderen();
+// var mailOpties = {
+//   from: 'gamebuddyteamtech@gmail.com',
+//   to: 'asa@marjew.nl',
+//   subject: 'Sending Email using Node.js',
+//   text: 'That was easy!',
+// };
 
-//404
+// transporter.sendMail(mailOptions, function (error, info) {
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     console.log('Email sent: ' + info.response);
+//   }
+// });
+
+// Weergave van de 404 pagina
 app.use(function (req, res) {
   res.status(404).render('404');
 });
 
-//app geeft de port terug
+// Applicatie geeft de port terug
 app.listen(port, () => {
   console.log(`Server is aan http://localhost:5000`);
 });
