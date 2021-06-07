@@ -108,6 +108,8 @@ app.get('/zoeken', (req, res) => {
   });
 });
 
+//app.get('/zoeken', renderZoeken);
+
 //wijzigen route
 app.get('/wijzigen', (req, res) => {
   res.render('wijzigen');
@@ -138,6 +140,61 @@ app.post('/zoeken', handleFavorieten);
 app.post('/favorieten', handleFavorietenVerwijderen);
 
 // -- routing functions --
+
+function renderZoeken(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  client.connect((err, db) => {
+    if (err) throw err;
+    const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+    const favorietenCol = db.db('TechTeam').collection('favorieten');
+    let users = gebruikersCol.find().toArray();
+    let undiscoveredUsers = users.then(gebruikers => {
+      gebruikers.filter(gebruiker => {
+        favorietenCol.findOne({ id: 0 }).then(favorieten => {
+          !favorieten.opgeslagen.includes(gebruiker.naam);
+        });
+      });
+    });
+    undiscoveredUsers.then(data => {
+      res.render('zoeken', { gebruikersLijst: data });
+    });
+  });
+}
+
+// function renderZoeken(req, res) {
+//   const client = new MongoClient(uri, {
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true,
+//   });
+
+//   client.connect((err, db) => {
+//     if (err) throw err;
+//     const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+//     const favorietenCol = db.db('TechTeam').collection('favorieten');
+//     gebruikersCol
+//       .find()
+//       .toArray()
+//       .then(gebruikers => {
+//         let undiscoveredUsers = [];
+//         gebruikers.forEach(gebruiker => {
+//           favorietenCol.findOne({ id: 0 }).then(results => {
+//             if (!results.opgeslagen.includes(gebruiker.naam)) {
+//               undiscoveredUsers.push(gebruiker);
+//             }
+//           });
+//         });
+//         Promise.all(undiscoveredUsers).then(data => {
+//           //console.log(data);
+//           res.render('zoeken', { gebruikersLijst: data });
+//           //db.close();
+//         });
+//       });
+//   });
+// }
 
 function renderFavorieten(req, res) {
   const client = new MongoClient(uri, {
