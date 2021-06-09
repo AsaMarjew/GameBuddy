@@ -274,7 +274,6 @@ function verwijderen(req, res) {
   const email = req.body.verwijderemail;
   client.connect((err, db) => {
     db.db('TechTeam').collection('gebruikers').deleteMany({ email: email });
-    db.close();
     res.redirect('/verwijderenbericht');
   });
 }
