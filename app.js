@@ -237,18 +237,13 @@ app.post("/zoeken", async (req, res) => {
     db.db("TechTeam")
       .collection("gebruikers")
       .find(query)
-      .toArray(function (err, result) {
+      .toArray(function (err, gebruikers) {
         if (err) throw err;
-        console.log(result);
-
-        db.db("TechTeam")
-          .collection("gebruikers")
-          .find({}, function (err, gebruikers) {
-            res.render("zoeken", {
-              gebruikersLijst: gebruikers,
-              consoleFilter,
-            });
-          });
+        console.log(gebruikers);
+        res.render("zoeken", {
+          gebruikersLijst: gebruikers,
+          consoleFilter,
+        });
         db.close();
       });
   });
