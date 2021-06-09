@@ -266,7 +266,7 @@ app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
 });
 
 /*  Met de functie verwijderen worden documenten verwijderd uit de database.
-    Dit wordt gedaan met deleteMany waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
+    Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
 app.post('/verwijderen', verwijderen);
 
 function verwijderen(req, res) {
@@ -280,29 +280,16 @@ function verwijderen(req, res) {
   client.connect((err, db) => {
     db.db('TechTeam')
       .collection('gebruikers')
-      .findOneAndDelete({ email: email })
-      .then(result => {
-        console.log(result);
-      });
+      .deleteMany({ email: email })
+      .then(message);
 
     res.redirect('/zoeken');
   });
 }
 
-// var mailOpties = {
-//   from: 'gamebuddyteamtech@gmail.com',
-//   to: 'asa@marjew.nl',
-//   subject: 'Sending Email using Node.js',
-//   text: 'That was easy!',
-// };
-
-// transporter.sendMail(mailOptions, function (error, info) {
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log('Email sent: ' + info.response);
-//   }
-// });
+function message() {
+  window.alert(email + ' is verwijderd!');
+}
 
 // Weergave van de 404 pagina
 app.use(function (req, res) {
