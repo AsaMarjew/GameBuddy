@@ -217,28 +217,22 @@ app.post("/aanmelden", upload.single("image"), async (req, res) => {
 });
 
 //filter optie
+
 app.post("/zoeken", async (req, res) => {
   const consoleFilter = req.body.consolefilter;
   //lege query voor als alle aangevingt is
-  let query = {};
 
-  if (consoleFilter === "Alle") {
-    query = {};
-
-    //query met de gekozen fitler optie uit de dropdown in de filter menu
-  } else {
-    query = {
-      console: consoleFilter,
-    };
-  }
-
-  //lean zet het om in mongo objecten
-  const gebruikers = await gebruiker.find(query).lean();
-
-  //gebruikerslijst sturen en de filter optie
-  res.render("zoeken", {
-    gebruikersLijst: gebruikers,
-    consoleFilter,
+  client.connect((err, db) => {
+    if (err) throw err;
+    var query = { console: consoleFilter };
+    db.db("TechTeam")
+      .collection("gebruikers")
+      .find(query)
+      .toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        db.close();
+      });
   });
 });
 
