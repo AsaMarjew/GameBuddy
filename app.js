@@ -16,15 +16,6 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
 });
 
-// Nodemailer setup. Inloggen op het adres waar emails naar verzonden worden
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'gamebuddyteamtech@gmail.com',
-    pass: 'teamtech123',
-  },
-});
-
 // TEST Checken of er database connectie is
 // function test() {
 //   const client = new MongoClient(uri, {
@@ -138,6 +129,11 @@ app.get('/wijzigen', (req, res) => {
 // Weergave van de pagina verwijderen
 app.get('/verwijderen', (req, res) => {
   res.render('verwijderen');
+});
+
+// Weergave van de verwijderbericht pagina
+app.get('/verwijderenbericht', (req, res) => {
+  res.render('verwijderenbericht');
 });
 
 // Weergave van de tutorial pagina
@@ -276,19 +272,11 @@ function verwijderen(req, res) {
   });
 
   const email = req.body.verwijderemail;
-
   client.connect((err, db) => {
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .deleteMany({ email: email })
-      .then(message);
-
-    res.redirect('/zoeken');
+    db.db('TechTeam').collection('gebruikers').deleteMany({ email: email });
+    db.close();
+    res.redirect('/verwijderenbericht');
   });
-}
-
-function message() {
-  window.alert(email + ' is verwijderd!');
 }
 
 // Weergave van de 404 pagina
