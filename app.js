@@ -220,17 +220,35 @@ app.post("/aanmelden", upload.single("image"), async (req, res) => {
 
 app.post("/zoeken", async (req, res) => {
   const consoleFilter = req.body.consolefilter;
-  //lege query voor als alle aangevingt is
 
   client.connect((err, db) => {
     if (err) throw err;
-    var query = { console: consoleFilter };
+
+    let query = {};
+
+    if (consoleFilter === "Alle") {
+      query = {};
+    } else {
+      query = {
+        console: consoleFilter,
+      };
+    }
+
     db.db("TechTeam")
       .collection("gebruikers")
       .find(query)
       .toArray(function (err, result) {
         if (err) throw err;
         console.log(result);
+
+        db.db("TechTeam")
+          .collection("gebruikers")
+          .find({}, function (err, gebruikers) {
+            res.render("zoeken", {
+              gebruikersLijst: gebruikers,
+              consoleFilter,
+            });
+          });
         db.close();
       });
   });
