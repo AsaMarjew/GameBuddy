@@ -3,6 +3,8 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+//const MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -56,6 +58,28 @@ const uploadWijzig = multer({
   },
 });
 
+//sessions
+// const store = new MongoDBStore({
+//   uri: uri,
+//   collections: 'sessions',
+// });
+
+const sessionID = 'unniqueSessionID';
+
+const redirectLogin = (req, res, next) => {
+  if (!req.session.userId) {
+    res.redirect('inloggen');
+  } else {
+    next();
+  }
+};
+const redirectHome = (req, res, next) => {
+  if (req.session.userId) {
+    res.redirect('dashboard');
+  } else {
+    next();
+  }
+};
 //de css, img en js map in de public map gebruiken
 app.use(express.static('public'));
 app.use('/css', express.static(__dirname + 'public.css'));
@@ -72,12 +96,30 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// use the session middleware
+app.use(
+  session({
+    name: sessionID,
+    resave: false,
+    saveUninitialized: false,
+    // store: store,
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+      maxAge: 1000 * 60 * 30,
+      sameSite: true,
+      // duration before the session is lost = 30 min
+    },
+  })
+);
 // database connectie mongo-db
 
 // --- routing ---
 
 // render index
 app.get('', (req, res) => {
+  console.log(req.session);
+  console.log(req.session.id);
+
   res.render('index');
 });
 
@@ -88,6 +130,10 @@ app.get('/aanmelden', (req, res) => {
 
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
 app.get('/zoeken', (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
   client.connect((err, db) => {
     if (err) throw err;
     db.db('TechTeam')
@@ -125,37 +171,50 @@ app.get('/error', (req, res) => {
 // --- handle post ---
 
 //als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
-app.post('/aanmelden', upload.single('image'), async (req, res) => {
-  //console.log(request.file);
-  client.connect((err, db) => {
-    if (err) throw err;
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .insertOne({
-        naam: req.body.naam,
-        leeftijd: req.body.leeftijd,
-        email: req.body.email,
-        telefoon: req.body.telefoon,
-        console: req.body.console,
-        bio: req.body.bio,
-        game1: req.body.game1,
-        game2: req.body.game2,
-        game3: req.body.game3,
-        game4: req.body.game4,
-        img: req.file.filename,
-      })
-      .then(() => {
-        db.close();
-        res.redirect('/zoeken');
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  });
-});
+app.post(
+  '/aanmelden',
+  upload.single('image'),
+  redirectHome,
+  async (req, res) => {
+    const client = new MongoClient(uri, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    });
+    client.connect((err, db) => {
+      if (err) throw err;
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .insertOne({
+          naam: req.body.naam,
+          leeftijd: req.body.leeftijd,
+          email: req.body.email,
+          wachtwoord: req.body.wachtwoordaanmelden,
+          telefoon: req.body.telefoon,
+          console: req.body.console,
+          bio: req.body.bio,
+          game1: req.body.game1,
+          game2: req.body.game2,
+          game3: req.body.game3,
+          game4: req.body.game4,
+          img: req.file.filename,
+        })
+        .then(() => {
+          db.close();
+          res.redirect('/zoeken');
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    });
+  }
+);
 
 //filter optie
 app.post('/zoeken', async (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
   const consoleFilter = req.body.consolefilter;
   //lege query voor als alle aangevingt is
   let query = {};
@@ -211,27 +270,6 @@ app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
           console.log(err);
         });
     });
-
-    // const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
-    // doc.overwrite({
-    //   naam: req.body.wijzignaam,
-    //   leeftijd: req.body.wijzigleeftijd,
-    //   email: req.body.wijzigemail,
-    //   telefoon: req.body.wijzigtelefoon,
-    //   console: req.body.wijzigconsole,
-    //   bio: req.body.wijzigbio,
-    //   game1: req.body.wijziggame1,
-    //   game2: req.body.wijziggame2,
-    //   game3: req.body.wijziggame3,
-    //   game4: req.body.wijziggame4,
-    //   img: req.file.filename,
-    // });
-
-    // //de updates worden opgeslagen
-    // await doc.save();
-    // res.redirect('/zoeken');
-
-    //bij een error wordt de gebruiker doorverwezen naar de error pagina
   } catch (err) {
     console.log(err);
     res.redirect('/error');
@@ -250,8 +288,63 @@ app.post('/verwijderen', async (req, res) => {
   }
 });
 
+// --- Login ---
+app.get('/inloggen', (req, res) => {
+  res.render('inloggen');
+  console.log(req.session);
+});
+
+//render dashboard
+app.get('/dashboard', (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+  client.connect((err, db) => {
+    if (err) throw err;
+
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOne({ email: req.body.emailInloggen })
+      .then(gebruiker => {
+        res.render('dashboard', { gebruikersLijst: gebruiker });
+        db.close();
+      });
+  });
+});
+
+//login with session
+app.post('/inloggen', (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+  client.connect((err, db) => {
+    let gebruikers = db.db('TechTeam').collection('gebruikers');
+    if (err) throw err;
+    if (req.body.emailInloggen && req.body.wachtwoordInloggen) {
+      gebruikers.findOne(
+        { email: req.body.emailInloggen },
+        (err, gebruiker) => {
+          if (err) throw err;
+          if (
+            gebruiker &&
+            gebruiker.wachtwoord === req.body.wachtwoordInloggen
+          ) {
+            res.redirect('dashboard');
+          } else {
+            res.redirect('/');
+          }
+        }
+      );
+    }
+  });
+});
+
+app.post('/logout', redirectLogin, (req, res) => {});
+
 //404
-app.use(function (req, res) {
+app.use((req, res) => {
   res.status(404).render('404');
 });
 
