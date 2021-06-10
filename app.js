@@ -305,7 +305,7 @@ app.get('/dashboard', (req, res) => {
 
     db.db('TechTeam')
       .collection('gebruikers')
-      .findOne({ email: req.body.emailInloggen })
+      .findOne({ naam: 'test' })
       .then(gebruiker => {
         res.render('dashboard', { gebruikersLijst: gebruiker });
         db.close();
