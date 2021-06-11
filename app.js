@@ -112,6 +112,10 @@ app.get('/error', (req, res) => {
   res.render('error');
 });
 
+app.get('/comp', (req, res) => {
+  res.render('comp');
+});
+
 // --- post ---
 
 // favorieten post
