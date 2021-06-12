@@ -119,8 +119,17 @@ app.get("/hoe-werkt-het", (req, res) => {
   res.render("hoewerkthet");
 });
 
+//error route
+app.get("/error", (req, res) => {
+  res.render("error");
+});
+
+// api get
+app.get("/fortnite", handleApi);
+
 //fortnie route
-app.get("/fortnite", async (req, res) => {
+
+async function handleApi(req, res) {
   // --- fortnite API ---
   const fortniteApi = await fetch(
     "https://fortnite-api.theapinetwork.com/items/list"
@@ -177,12 +186,13 @@ app.get("/fortnite", async (req, res) => {
         img4: img4,
       });
     });
-});
+}
 
-//error route
-app.get("/error", (req, res) => {
-  res.render("error");
-});
+// filter post
+app.post("/zoeken", handleFilteren);
+
+// favorieten post
+app.post("/zoeken", handleFavorieten);
 
 // --- handle post ---
 
@@ -217,8 +227,7 @@ app.post("/aanmelden", upload.single("image"), async (req, res) => {
 });
 
 //filter optie
-
-app.post("/zoeken", async (req, res) => {
+function handleFilteren(req, res) {
   const consoleFilter = req.body.consolefilter;
 
   client.connect((err, db) => {
@@ -247,7 +256,31 @@ app.post("/zoeken", async (req, res) => {
         db.close();
       });
   });
-});
+}
+
+function handleFavorieten(req, res) {
+  // reinstantiate client to prevent closed topology error
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+  console.log("test");
+
+  // voeg gebruikers ID aan favorieten toe
+  let gebNaam = req.body.gebruikerNaam;
+  client.connect(function (err, db) {
+    if (err) throw err;
+    let favorietenCol = db.db("TechTeam").collection("favorieten");
+    favorietenCol
+      .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebNaam } })
+      .then(() => {
+        db.close();
+      });
+  });
+  setTimeout(() => {
+    res.redirect("back");
+  }, 70);
+}
 
 //wijzigingen doorvoeren
 app.post("/wijzigen", uploadWijzig.single("wijzigimage"), async (req, res) => {

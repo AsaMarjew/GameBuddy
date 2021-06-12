@@ -299,6 +299,59 @@ footer section a {
   margin-bottom: 30px;
 }
 
+.card form {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin: 15px auto;
+}
+
+.card .favorietenButton {
+  width: 100%;
+  height: 100%;
+  background-color: #232323;
+  border: none;
+  border-radius: 5px;
+}
+
+.card .favorietenButton + svg {
+  color: var(--geel);
+}
+
+.card .favorietenButton:hover {
+  cursor: pointer;
+}
+
+.card .favorietenButton:hover + svg {
+  font-size: 35px;
+}
+
+.card form svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+.big {
+  font-size: 1.3em;
+  margin-bottom: 15px;
+}
+
+.empty {
+  font-size: 12em;
+  color: var(--geel);
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.empty:hover {
+  font-size: 12em;
+}
+
 @media only screen and (max-width: 500px) {
   .card div:first-child section:first-child span h2,
   .card div:first-child section:first-child span p {

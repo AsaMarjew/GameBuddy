@@ -17,7 +17,6 @@
         <p>(<%= gebruiker.leeftijd %>)</p></span
       >
     </section>
-
     <section>
       <img
         src="/uploads/<%= gebruiker.img %>"
@@ -25,12 +24,21 @@
         class="avatarimg"
       />
     </section>
-
     <section>
       <p><%= gebruiker.bio %></p>
     </section>
+    <section>
+      <form method="post" action="/zoeken">
+        <input
+          type="hidden"
+          value="<%- gebruiker.naam %>"
+          name="gebruikerNaam"
+        />
+        <input type="submit" class="favorietenButton" value="" />
+        <i class="fas fa-heart"></i>
+      </form>
+    </section>
   </div>
-
   <div>
     <section>
       <img
@@ -39,7 +47,6 @@
         class="consoleimg"
       />
     </section>
-
     <section>
       <span
         ><i class="fab fa-whatsapp-square"></i>
@@ -48,7 +55,6 @@
         ></span
       >
     </section>
-
     <section>
       <img
         src="img/game/<%= gebruiker.game1 %>.svg"
