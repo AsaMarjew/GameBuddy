@@ -4,7 +4,7 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-//const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -15,24 +15,6 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
 });
-
-// TEST Checken of er database connectie is
-// function test() {
-//   const client = new MongoClient(uri, {
-//     useUnifiedTopology: true,
-//     useNewUrlParser: true,
-//   });
-//   client.connect((err, db) => {
-//     db.db('TechTeam')
-//       .collection('gebruikers')
-//       .findOne({ naam: 'Asa Marjew' })
-//       .then(result => {
-//         console.log(result);
-//       });
-//   });
-// }
-
-// test();
 
 // --- Multer ---
 
@@ -92,6 +74,15 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Nodemailer - Hier wordt de nodemailer opgezet en wordt er ingelogd op het adres waar emails van verzonden worden
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'gamebuddyteamtech@gmail.com',
+    pass: 'teamtech123',
+  },
+});
 
 // --- routing ---
 
@@ -319,6 +310,21 @@ function verwijderen(req, res) {
         if (doc.length === 0) {
           res.redirect('/verwijderennotfound');
         } else if (doc) {
+          var mailOptions = {
+            from: 'gamebuddyteamtech@gmail.com',
+            to: email,
+            subject: 'GameBuddy App - Accountwijziging',
+            text: 'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
+          };
+
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+
           res.redirect('/verwijderenbericht');
         }
       });
