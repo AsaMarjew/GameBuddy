@@ -4,7 +4,7 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
+//const nodemailer = require('nodemailer');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -136,6 +136,11 @@ app.get('/verwijderenbericht', (req, res) => {
   res.render('verwijderenbericht');
 });
 
+// Weergave van de verwijdernotfound pagina
+app.get('/verwijderennotfound', (req, res) => {
+  res.render('verwijderennotfound');
+});
+
 // Weergave van de tutorial pagina
 app.get('/hoe-werkt-het', (req, res) => {
   res.render('hoewerkthet');
@@ -218,9 +223,20 @@ app.post('/zoeken', async (req, res) => {
 // });
 
 // Wijzigingen doorvoeren
+// app.post('/wijzigen', uploadWijzig.single('wijzigimage'), wijzigen);
+
+// async function wijzigen(req, res) {
+
+// }
+
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
   try {
+    const client = new MongoClient(uri, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    });
     //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
+
     client.connect((err, db) => {
       if (err) throw err;
       db.db('TechTeam')
@@ -272,9 +288,18 @@ function verwijderen(req, res) {
   });
 
   const email = req.body.verwijderemail;
+
   client.connect((err, db) => {
-    db.db('TechTeam').collection('gebruikers').deleteMany({ email: email });
-    res.redirect('/verwijderenbericht');
+    const collection = db.db('TechTeam').collection('gebruikers');
+    collection
+      .find({ email: email }, { $exists: true })
+      .toArray(function (err, doc) {
+        if (doc.length === 0) {
+          res.redirect('/verwijderennotfound');
+        } else if (doc) {
+          res.redirect('/verwijderenbericht');
+        }
+      });
   });
 }
 
