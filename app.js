@@ -1,4 +1,3 @@
-// merge test
 require("dotenv").config();
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
@@ -189,10 +188,7 @@ async function handleApi(req, res) {
 }
 
 // filter post
-app.post("/zoeken", handleFilteren);
-
-// favorieten post
-app.post("/zoeken", handleFavorieten);
+app.post("/zoeken", handleZoeken);
 
 // --- handle post ---
 
@@ -226,29 +222,51 @@ app.post("/aanmelden", upload.single("image"), async (req, res) => {
   });
 });
 
+function handleZoeken(req, res) {
+  //nieuwe variabel gebruikersnaam uit favorieten
+  let gebNaam = req.body.gebruikerNaam;
+
+  //check of de favorieten gebruikersnaam bestaat
+  if (gebNaam) {
+    handleFavorieten(req, res);
+    //als het niet bestaat wordt filteren uitgevoerd
+  } else {
+    handleFilteren(req, res);
+  }
+}
+
 //filter optie
 function handleFilteren(req, res) {
+  //gekozen console optie door de gebruiker
   const consoleFilter = req.body.consolefilter;
 
+  //connectie database
   client.connect((err, db) => {
     if (err) throw err;
 
+    //nieuwe lege query
     let query = {};
 
+    //als gebruiker op de optie alle klikt wordt er een lege query verstuurd
     if (consoleFilter === "Alle") {
       query = {};
+      //als de gebruiker een console kiest wordt de console uit de form in de query gezet
     } else {
       query = {
         console: consoleFilter,
       };
     }
 
+    //verbinding met db en de collectie
     db.db("TechTeam")
       .collection("gebruikers")
+      //in de db wordt met de query gezocht
       .find(query)
+      //resultaten worden in een array gezet
       .toArray(function (err, gebruikers) {
         if (err) throw err;
         console.log(gebruikers);
+        //de gegevens worden gerenderd
         res.render("zoeken", {
           gebruikersLijst: gebruikers,
           consoleFilter,
@@ -259,6 +277,7 @@ function handleFilteren(req, res) {
 }
 
 function handleFavorieten(req, res) {
+  console.log(testfavor);
   // reinstantiate client to prevent closed topology error
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
@@ -268,6 +287,7 @@ function handleFavorieten(req, res) {
 
   // voeg gebruikers ID aan favorieten toe
   let gebNaam = req.body.gebruikerNaam;
+  console.log(gebNaam);
   client.connect(function (err, db) {
     if (err) throw err;
     let favorietenCol = db.db("TechTeam").collection("favorieten");

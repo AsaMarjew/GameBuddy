@@ -548,3 +548,29 @@ footer section a {
   font-size: 0.7em;
   color: var(--grijs);
 }
+
+.fortnite h1 {
+  margin-bottom: 0px;
+}
+
+.fortnite p {
+  color: var(--wit);
+  padding: 50px;
+}
+
+.fortnite ul li a {
+  background-color: var(--lichtgrijs);
+  color: var(--grijs);
+  padding: 10px;
+  display: block;
+  text-align: center;
+  margin: 20px auto;
+  border-radius: 20px;
+  text-decoration: none;
+  width: 70%;
+}
+
+.fortnite ul li:last-child a {
+  background-color: var(--geel);
+  color: var(--grijs);
+}
