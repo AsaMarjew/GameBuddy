@@ -320,10 +320,10 @@ app.get('/dashboard', (req, res) => {
 
       db.db('TechTeam')
         .collection('gebruikers')
-        .findOne({ naam: 'test' })
-        .then(gebruiker => {
-          res.render('dashboard', { gebruikersLijst: gebruiker });
-          console.log(gebruiker);
+        .findOne({ naam: req.session.naam })
+        .then(() => {
+          res.render('dashboard', { gebruikersLijst: req.session.userId });
+          console.log(req.session.userId);
           db.close();
         });
     });
