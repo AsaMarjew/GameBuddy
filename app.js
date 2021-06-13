@@ -67,6 +67,7 @@ const uploadWijzig = multer({
 const sessionID = 'unniqueSessionID';
 
 const redirectLogin = (req, res, next) => {
+  let { userId } = req.session;
   if (!req.session.userId) {
     res.redirect('inloggen');
   } else {
@@ -116,9 +117,15 @@ app.use(
 // --- routing ---
 
 // render index
-app.get('', (req, res) => {
+app.get('/', (req, res) => {
   console.log(req.session);
-  console.log(req.session.id);
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('dashboard');
+    console.log(req.session);
+  }
 
   res.render('index');
 });
@@ -290,8 +297,12 @@ app.post('/verwijderen', async (req, res) => {
 
 // --- Login ---
 app.get('/inloggen', (req, res) => {
-  res.render('inloggen');
-  console.log(req.session);
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('inloggen');
+  } else {
+    res.redirect('dashboard');
+  }
 });
 
 //render dashboard
@@ -300,17 +311,23 @@ app.get('/dashboard', (req, res) => {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
-  client.connect((err, db) => {
-    if (err) throw err;
+  let { userId } = req.session;
+  if (!userId) {
+    res.redirect('inloggen');
+  } else {
+    client.connect((err, db) => {
+      if (err) throw err;
 
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .findOne({ naam: 'test' })
-      .then(gebruiker => {
-        res.render('dashboard', { gebruikersLijst: gebruiker });
-        db.close();
-      });
-  });
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .findOne({ naam: 'test' })
+        .then(gebruiker => {
+          res.render('dashboard', { gebruikersLijst: gebruiker });
+          console.log(gebruiker);
+          db.close();
+        });
+    });
+  }
 });
 
 //login with session
@@ -321,19 +338,21 @@ app.post('/inloggen', (req, res) => {
   });
   client.connect((err, db) => {
     let gebruikers = db.db('TechTeam').collection('gebruikers');
-    if (err) throw err;
-    if (req.body.emailInloggen && req.body.wachtwoordInloggen) {
+    const email = req.body.emailInloggen;
+    const password = req.body.wachtwoordInloggen;
+
+    if (email && password) {
       gebruikers.findOne(
-        { email: req.body.emailInloggen },
-        (err, gebruiker) => {
-          if (err) throw err;
-          if (
-            gebruiker &&
-            gebruiker.wachtwoord === req.body.wachtwoordInloggen
-          ) {
-            res.redirect('dashboard');
+        {
+          email: email,
+          wachtwoord: password,
+        },
+        (err, data) => {
+          if (err) {
+            next(err);
           } else {
-            res.redirect('/');
+            req.session.userId = data;
+            res.redirect('/dashboard');
           }
         }
       );
@@ -341,7 +360,15 @@ app.post('/inloggen', (req, res) => {
   });
 });
 
-app.post('/logout', redirectLogin, (req, res) => {});
+app.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.redirect('dashboard');
+    } else {
+      res.redirect('/');
+    }
+  });
+});
 
 //404
 app.use((req, res) => {

@@ -488,10 +488,16 @@ footer section a {
   padding: 10px 90px;
   border-radius: 25px;
   border: 0px;
-  background-color: var(--geel);
+  background-color: transparent;
+  border: 3px solid var(--geel);
+  color: var(--geel);
   font-size: 1em;
   letter-spacing: 2px;
   cursor: pointer;
   margin-top: 30px;
   margin-bottom: 80px;
+}
+
+.dashboard {
+  color: #fff;
 }

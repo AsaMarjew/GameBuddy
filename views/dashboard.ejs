@@ -4,7 +4,73 @@
   ></span>
 </div>
 
-<h1>Welkom terug, <%= gebruikersLijst.naam %></h1>
+<h1>Welkom terug, <%= gebruikersLijst.naam %>!</h1>
+<p class="home dashboard">Bekijk je profiel hieronder</p>
+
+<div class="card" data-aos="fade-up">
+  <div>
+    <section>
+      <span
+        ><h2><%= gebruikersLijst.naam %></h2>
+        <p>(<%= gebruikersLijst.leeftijd %>)</p></span
+      >
+    </section>
+
+    <section>
+      <img
+        src="/uploads/<%= gebruikersLijst.img %>"
+        alt="Geen gekozen profielfoto"
+        class="avatarimg"
+      />
+    </section>
+
+    <section>
+      <p><%= gebruikersLijst.bio %></p>
+    </section>
+  </div>
+
+  <div>
+    <section>
+      <img
+        src="img/console/<%= gebruikersLijst.console %>.svg"
+        alt="Logo van de console"
+        class="consoleimg"
+      />
+    </section>
+
+    <section>
+      <span
+        ><i class="fab fa-whatsapp-square"></i>
+        <a href="https://wa.me/31<%= gebruikersLijst.telefoon %>"
+          >0<%= gebruikersLijst.telefoon %></a
+        ></span
+      >
+    </section>
+
+    <section>
+      <img
+        src="img/game/<%= gebruikersLijst.game1 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+      <img
+        src="img/game/<%= gebruikersLijst.game2 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+      <img
+        src="img/game/<%= gebruikersLijst.game3 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+      <img
+        src="img/game/<%= gebruikersLijst.game4 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+    </section>
+  </div>
+</div>
 
 <form method="POST" action="/logout">
   <input class="uitloggen" value="Log out" type="submit" />
