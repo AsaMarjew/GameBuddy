@@ -28,54 +28,12 @@ p {
   color: white;
 }
 
-svg:hover {
-  transition: 0.3s;
-  font-size: 1.2em;
-}
-
-h1 {
-  font-size: 1.8em;
-  text-align: center;
-  margin-bottom: 70px;
-  margin-top: 50px;
-  color: var(--wit);
-}
-
-h2 {
-  font-size: 1.3em;
-  text-align: center;
-  margin-bottom: 30px;
-  margin-top: 10px;
-  color: var(--wit);
-}
-
-body {
-  background-color: #dcdcdc;
-}
-
-main {
-  text-align: center;
-}
-
-/* APP MAX 600 PX, MOBIEL FORMAAT */
-#app {
-  max-width: 600px;
-  margin: auto;
-  background-color: var(--grijs);
-}
-
-header a {
-  padding: 10px;
-  font-size: 1.3em;
-  color: var(--wit);
-  text-decoration: none;
-}
-
 /* BEGIN HOME */
 .home {
   display: grid;
   text-align: center;
   margin-top: 50px;
+  position: relative;
 }
 
 .home img {

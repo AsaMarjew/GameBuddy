@@ -100,9 +100,6 @@ app.get('/verwijderen', (req, res) => {
   res.render('verwijderen');
 });
 
-// favorieten route
-app.get('/favorieten', renderFavorieten);
-
 //tutorial route
 app.get('/hoe-werkt-het', (req, res) => {
   res.render('hoewerkthet');
@@ -285,7 +282,10 @@ app.post('/zoeken', async (req, res) => {
     gebruikersLijst: gebruikers,
     consoleFilter,
   });
-});
+  setTimeout(() => {
+    res.redirect("back");
+  }, 70);
+}
 
 //wijzigingen doorvoeren
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
