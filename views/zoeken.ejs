@@ -1,18 +1,21 @@
 <div id="zoeken-menu">
-    <span id="verwijderen"><a href="/verwijderen"><i class="fas fa-trash"></i></a></span>
-    <span id="instellingen"><a href="/wijzigen"><i class="fas fa-cog"></i></a></span>
-    <span id="filter"><i class="fas fa-filter"></i></span>
+  <span id="verwijderen"
+    ><a href="/verwijderen"><i class="fas fa-trash"></i></a
+  ></span>
+  <span id="instellingen"
+    ><a href="/wijzigen"><i class="fas fa-cog"></i></a
+  ></span>
+  <span id="filter"><i class="fas fa-filter"></i></span>
 </div>
 
 <%gebruikersLijst.forEach(gebruiker => {%>
 <div class="card" data-aos="fade-up">
-
   <div>
     <section>
-      <span>
-        <h2><%= gebruiker.naam %></h2>
-        <p>(<%= gebruiker.leeftijd %>)</p>
-      </span>
+      <span
+        ><h2><%= gebruiker.naam %></h2>
+        <p>(<%= gebruiker.leeftijd %>)</p></span
+      >
     </section>
     <section>
       <img
@@ -97,3 +100,4 @@
       <input type="submit" value="Filteren" />
     </form>
   </div>
+</div>
