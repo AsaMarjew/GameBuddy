@@ -213,29 +213,36 @@ app.post('/zoeken', async (req, res) => {
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), wijzigen);
 
 async function wijzigen(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
   const email = req.body.wijzigemail;
 
   client.connect((err, db) => {
     if (err) throw err;
     db.db('TechTeam')
       .collection('gebruikers')
-      .findOneAndUpdate({ email: email })
+      .findOneAndUpdate(
+        { email: email },
+        {
+          $set: {
+            naam: req.body.wijzignaam,
+            leeftijd: req.body.wijzigleeftijd,
+            email: req.body.wijzigemail,
+            telefoon: req.body.wijzigtelefoon,
+            console: req.body.wijzigconsole,
+            bio: req.body.wijzigbio,
+            game1: req.body.wijziggame1,
+            game2: req.body.wijziggame2,
+            game3: req.body.wijziggame3,
+            game4: req.body.wijziggame4,
+            img: req.file.filename,
+          },
+        }
+      )
       .then(() => {
-        const doc = gebruiker.findOne({ email: email });
-        doc.overwrite({
-          naam: req.body.wijzignaam,
-          leeftijd: req.body.wijzigleeftijd,
-          email: req.body.wijzigemail,
-          telefoon: req.body.wijzigtelefoon,
-          console: req.body.wijzigconsole,
-          bio: req.body.wijzigbio,
-          game1: req.body.wijziggame1,
-          game2: req.body.wijziggame2,
-          game3: req.body.wijziggame3,
-          game4: req.body.wijziggame4,
-          img: req.file.filename,
-        });
-        doc.save();
         db.close();
         res.redirect('/wijzigenbericht');
       })
@@ -245,55 +252,6 @@ async function wijzigen(req, res) {
       });
   });
 }
-
-// app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
-//   try {
-//     const client = new MongoClient(uri, {
-//       useUnifiedTopology: true,
-//       useNewUrlParser: true,
-//     });
-//     //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
-//     const email = req.body.wijzigemail;
-
-//     client.connect((err, db) => {
-//       const collection = db.db('TechTeam').collection('gebruikers');
-//       if (err) throw err;
-//       collection
-//         .findOneAndUpdate()
-//         .then(() => {
-//           db.close();
-//           res.redirect('/zoeken');
-//         })
-//         .catch(err => {
-//           console.log(err);
-//         });
-//     });
-
-//     const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
-//     doc.overwrite({
-//       naam: req.body.wijzignaam,
-//       leeftijd: req.body.wijzigleeftijd,
-//       email: req.body.wijzigemail,
-//       telefoon: req.body.wijzigtelefoon,
-//       console: req.body.wijzigconsole,
-//       bio: req.body.wijzigbio,
-//       game1: req.body.wijziggame1,
-//       game2: req.body.wijziggame2,
-//       game3: req.body.wijziggame3,
-//       game4: req.body.wijziggame4,
-//       img: req.file.filename,
-//     });
-
-//     // de updates worden opgeslagen
-//     await doc.save();
-//     res.redirect('/zoeken');
-
-//     // Bij een error wordt de gebruiker doorverwezen naar de error pagina
-//   } catch (err) {
-//     console.log(err);
-//     res.redirect('/error');
-//   }
-// });
 
 /*  Met de functie verwijderen worden documenten verwijderd uit de database.
     Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
