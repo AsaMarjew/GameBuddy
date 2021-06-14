@@ -6,6 +6,82 @@
 
 <h1>Favorieten</h1>
 
+<% if(gebruikersLijst.length > 0) { gebruikersLijst.forEach(gebruiker => { %>
+<div class="card" data-aos="fade-up">
+  <div>
+    <section>
+      <span
+        ><h2><%= gebruiker.naam %></h2>
+        <p>(<%= gebruiker.leeftijd %>)</p></span
+      >
+    </section>
+    <section>
+      <img
+        src="/uploads/<%= gebruiker.img %>"
+        alt="Geen gekozen profielfoto"
+        class="avatarimg"
+      />
+    </section>
+    <section>
+      <p><%= gebruiker.bio %></p>
+    </section>
+
+    <section>
+      <form method="post" action="/favorieten">
+        <input
+          type="hidden"
+          value="<%- gebruiker.naam %>"
+          name="gebruikerNaam"
+        />
+        <input type="submit" class="favorietenButton" value="" />
+        <i class="fas fa-heart-broken"></i>
+      </form>
+    </section>
+  </div>
+  <div>
+    <section>
+      <img
+        src="img/console/<%= gebruiker.console %>.svg"
+        alt="Logo van de console"
+        class="consoleimg"
+      />
+    </section>
+    <section>
+      <span
+        ><i class="fab fa-whatsapp-square"></i>
+        <a href="https://wa.me/31<%= gebruiker.telefoon %>"
+          >0<%= gebruiker.telefoon %></a
+        ></span
+      >
+    </section>
+    <section>
+      <img
+        src="img/game/<%= gebruiker.game1 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+      <img
+        src="img/game/<%= gebruiker.game2 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+      <img
+        src="img/game/<%= gebruiker.game3 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+      <img
+        src="img/game/<%= gebruiker.game4 %>.svg"
+        alt="Logo van de game"
+        class="gameimg"
+      />
+    </section>
+  </div>
+</div>
+<%})} else { %>
+<p class="big">Het lijkt erop dat je nog geen favorieten hebt.</p>
+<i class="empty fas fa-heart-broken"></i>
+<p>Ga naar <a href="/zoeken">zoeken</a> om vrienden te maken!</p>
 <%
     if(gebruikersLijst.length > 0) {
         gebruikersLijst.forEach(gebruiker => {
