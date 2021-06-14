@@ -151,6 +151,11 @@ app.get('/error', (req, res) => {
 
 // Wanneer er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
 app.post('/aanmelden', upload.single('image'), async (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
   client.connect((err, db) => {
     if (err) throw err;
     db.db('TechTeam')
@@ -312,9 +317,16 @@ function verwijderen(req, res) {
         } else if (doc) {
           var mailOptions = {
             from: 'gamebuddyteamtech@gmail.com',
-            to: email,
+            to: 'asa@marjew.nl',
             subject: 'GameBuddy App - Accountwijziging',
             text: 'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
+            attachments: [
+              {
+                filename: 'Logo.png',
+                path: __dirname + '/public/img/logo.ico',
+                cid: 'logo',
+              },
+            ],
           };
 
           transporter.sendMail(mailOptions, function (error, info) {
@@ -324,7 +336,8 @@ function verwijderen(req, res) {
               console.log('Email sent: ' + info.response);
             }
           });
-
+          collection.deleteMany({ email: email });
+          db.close();
           res.redirect('/verwijderenbericht');
         }
       });
