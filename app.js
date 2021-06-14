@@ -243,6 +243,21 @@ async function wijzigen(req, res) {
         }
       )
       .then(() => {
+        var mailOpties = {
+          from: 'gamebuddyteamtech@gmail.com',
+          to: 'asa@marjew.nl',
+          subject: 'GameBuddy App - Accountwijziging',
+          text: 'Je GameBuddy account is gewijzigd!',
+          attachments: [
+            {
+              filename: 'Logo.png',
+              path: __dirname + '/public/img/logo.ico',
+              cid: 'logo',
+            },
+          ],
+        };
+
+        mailer(mailOpties);
         db.close();
         res.redirect('/wijzigenbericht');
       })
@@ -273,7 +288,7 @@ function verwijderen(req, res) {
         if (doc.length === 0) {
           res.redirect('/verwijderennotfound');
         } else if (doc) {
-          var mailOptions = {
+          var mailOpties = {
             from: 'gamebuddyteamtech@gmail.com',
             to: 'asa@marjew.nl',
             subject: 'GameBuddy App - Accountwijziging',
@@ -287,18 +302,22 @@ function verwijderen(req, res) {
             ],
           };
 
-          transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          });
+          mailer(mailOpties);
           collection.deleteMany({ email: email });
-          db.close();
           res.redirect('/verwijderenbericht');
         }
       });
+  });
+}
+
+// Functie die mail opties meekrijgt en alleen de mail verstuurd naar de gebruiker
+function mailer(Optie) {
+  transporter.sendMail(Optie, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
   });
 }
 
