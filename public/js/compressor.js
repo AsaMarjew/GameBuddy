@@ -1,3 +1,5 @@
+// compress de foto en
+
 function compress() {
   const file = document.querySelector('#comp').files[0];
   if (!file) return;
