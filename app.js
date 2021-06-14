@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
-const multer = require('multer');
+//const multer = require('multer');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -18,43 +18,43 @@ const client = new MongoClient(uri, {
 // --- Multer ---
 
 //afbeeldingen worden opgeslagen in de public/uploads map
-const storage = multer.diskStorage({
-  destination: function (request, file, callback) {
-    callback(null, './public/uploads');
-  },
+// const storage = multer.diskStorage({
+//   destination: function (request, file, callback) {
+//     callback(null, './public/uploads');
+//   },
 
-  //afbeeldingen krijgen naast de oorspronkelijke naam ook de huidige datum
-  filename: function (request, file, callback) {
-    callback(null, Date.now() + file.originalname);
-  },
-});
+//   //afbeeldingen krijgen naast de oorspronkelijke naam ook de huidige datum
+//   filename: function (request, file, callback) {
+//     callback(null, Date.now() + file.originalname);
+//   },
+// });
 
-//gewijzigde afbeeldingen
-const storageWijzig = multer.diskStorage({
-  destination: function (request, file, callback) {
-    callback(null, './public/uploads');
-  },
+// //gewijzigde afbeeldingen
+// const storageWijzig = multer.diskStorage({
+//   destination: function (request, file, callback) {
+//     callback(null, './public/uploads');
+//   },
 
-  filename: function (request, file, callback) {
-    callback(null, Date.now() + file.originalname);
-  },
-});
+//   filename: function (request, file, callback) {
+//     callback(null, Date.now() + file.originalname);
+//   },
+// });
 
-//uploaden en formaat limiet
-const upload = multer({
-  storage: storage,
-  limits: {
-    fieldSize: 1024 * 1024 * 3,
-  },
-});
+// //uploaden en formaat limiet
+// const upload = multer({
+//   storage: storage,
+//   limits: {
+//     fieldSize: 1024 * 1024 * 3,
+//   },
+// });
 
-//gewijzigde afbeeldingen
-const uploadWijzig = multer({
-  storage: storageWijzig,
-  limits: {
-    fieldSize: 1024 * 1024 * 3,
-  },
-});
+// //gewijzigde afbeeldingen
+// const uploadWijzig = multer({
+//   storage: storageWijzig,
+//   limits: {
+//     fieldSize: 1024 * 1024 * 3,
+//   },
+// });
 
 //de css, img en js map in de public map gebruiken
 app.use(express.static('public'));
@@ -113,7 +113,22 @@ app.get('/error', (req, res) => {
 });
 
 app.get('/comp', (req, res) => {
-  res.render('comp');
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  client.connect((err, db) => {
+    if (err) throw err;
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOne({ naam: 'Philip' })
+      .then(gebruiker => {
+        const foto = gebruiker.img;
+        res.render('comp', { data: foto });
+        db.close();
+      });
+  });
 });
 
 // --- post ---
@@ -234,9 +249,35 @@ function handleFavorietenVerwijderen(req, res) {
   }, 70);
 }
 
+app.post('/comp', (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  let image = req.body.image;
+
+  client.connect((err, db) => {
+    if (err) throw err;
+
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOneAndUpdate({ naam: 'Philip' }, { $set: { img: image } })
+      .then(() => {
+        res.redirect('back');
+        db.close();
+      });
+  });
+});
+
 //als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
-app.post('/aanmelden', upload.single('image'), async (req, res) => {
-  //console.log(request.file);
+app.post('/aanmelden', (req, res) => {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  console.log(req.body);
   client.connect((err, db) => {
     if (err) throw err;
     db.db('TechTeam')
@@ -252,7 +293,7 @@ app.post('/aanmelden', upload.single('image'), async (req, res) => {
         game2: req.body.game2,
         game3: req.body.game3,
         game4: req.body.game4,
-        img: req.file.filename,
+        img: req.body.image,
       })
       .then(() => {
         db.close();
@@ -291,48 +332,48 @@ app.post('/zoeken', async (req, res) => {
 });
 
 //wijzigingen doorvoeren
-app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
-  try {
-    //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
-    client.connect((err, db) => {
-      if (err) throw err;
-      db.db('TechTeam')
-        .collection('gebruikers')
-        .findOneAndUpdate()
-        .then(() => {
-          db.close();
-          res.redirect('/zoeken');
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    });
+// app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
+//   try {
+//     //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
+//     client.connect((err, db) => {
+//       if (err) throw err;
+//       db.db('TechTeam')
+//         .collection('gebruikers')
+//         .findOneAndUpdate()
+//         .then(() => {
+//           db.close();
+//           res.redirect('/zoeken');
+//         })
+//         .catch(err => {
+//           console.log(err);
+//         });
+//     });
 
-    // const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
-    // doc.overwrite({
-    //   naam: req.body.wijzignaam,
-    //   leeftijd: req.body.wijzigleeftijd,
-    //   email: req.body.wijzigemail,
-    //   telefoon: req.body.wijzigtelefoon,
-    //   console: req.body.wijzigconsole,
-    //   bio: req.body.wijzigbio,
-    //   game1: req.body.wijziggame1,
-    //   game2: req.body.wijziggame2,
-    //   game3: req.body.wijziggame3,
-    //   game4: req.body.wijziggame4,
-    //   img: req.file.filename,
-    // });
+//     // const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
+//     // doc.overwrite({
+//     //   naam: req.body.wijzignaam,
+//     //   leeftijd: req.body.wijzigleeftijd,
+//     //   email: req.body.wijzigemail,
+//     //   telefoon: req.body.wijzigtelefoon,
+//     //   console: req.body.wijzigconsole,
+//     //   bio: req.body.wijzigbio,
+//     //   game1: req.body.wijziggame1,
+//     //   game2: req.body.wijziggame2,
+//     //   game3: req.body.wijziggame3,
+//     //   game4: req.body.wijziggame4,
+//     //   img: req.file.filename,
+//     // });
 
-    // //de updates worden opgeslagen
-    // await doc.save();
-    // res.redirect('/zoeken');
+//     // //de updates worden opgeslagen
+//     // await doc.save();
+//     // res.redirect('/zoeken');
 
-    //bij een error wordt de gebruiker doorverwezen naar de error pagina
-  } catch (err) {
-    console.log(err);
-    res.redirect('/error');
-  }
-});
+//     //bij een error wordt de gebruiker doorverwezen naar de error pagina
+//   } catch (err) {
+//     console.log(err);
+//     res.redirect('/error');
+//   }
+// });
 
 //met deletemany worden alle records van de object verwijderd, aan de hand van de email
 app.post('/verwijderen', async (req, res) => {

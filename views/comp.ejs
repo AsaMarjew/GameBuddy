@@ -1,7 +1,15 @@
-<input type="file" id="comp" accept=".jpg, .jpeg, .png" />
-<button>upload</button>
+<form method="POST" action="/comp">
+  <input
+    type="file"
+    id="comp"
+    accept=".jpg, .jpeg, .png"
+    onchange="compress()"
+  />
 
-<img id="input" />
-<img id="output" />
+  <input type="hidden" value="" name="image" id="imgInput" />
+  <input type="submit" value="submit" />
+</form>
+
+<img src="<%- data %>" />
 
 <script src="js/compressor.js"></script>
