@@ -87,9 +87,21 @@ app.get("/aanmelden", (req, res) => {
   res.render("aanmelden");
 });
 
-
-//zoeken route
-app.get('/zoeken', renderZoeken);
+//zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
+app.get("/zoeken", (req, res) => {
+  client.connect((err, db) => {
+    if (err) throw err;
+    db.db("TechTeam")
+      .collection("gebruikers")
+      .find()
+      .toArray()
+      .then((gebruikers) => {
+        res.render("zoeken", {
+          gebruikersLijst: gebruikers,
+        });
+      });
+  });
+});
 
 //wijzigen route
 app.get("/wijzigen", (req, res) => {
@@ -100,9 +112,6 @@ app.get("/wijzigen", (req, res) => {
 app.get("/verwijderen", (req, res) => {
   res.render("verwijderen");
 });
-
-// favorieten route
-app.get('/favorieten', renderFavorieten);
 
 //tutorial route
 app.get("/hoe-werkt-het", (req, res) => {
@@ -181,120 +190,7 @@ async function handleApi(req, res) {
 // filter post
 app.post("/zoeken", handleZoeken);
 
-// favorieten post
-app.post('/favorieten', handleFavorietenVerwijderen);
-
-// -- routing functions --
-
-async function renderZoeken(req, res) {
-  try {
-    const client = new MongoClient(uri, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    });
-
-    client.connect(async (err, db) => {
-      if (err) throw err;
-
-      const gebruikersCol = db.db('TechTeam').collection('gebruikers');
-      const favorietenCol = db.db('TechTeam').collection('favorieten');
-
-      // haal alle gebruikers op en opgeslagen gebruikers
-      let users = await gebruikersCol.find().toArray();
-      const favorites = await favorietenCol.findOne({ id: 0 });
-
-      // maak nieuwe array waar opgeslagen gebruikers niet instaan
-      let undiscoveredUsers = users.filter(gebruiker => {
-        return !favorites.opgeslagen.includes(gebruiker.naam);
-      });
-
-      res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
-      db.close();
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-function renderFavorieten(req, res) {
-  const client = new MongoClient(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
-
-  client.connect((err, db) => {
-    if (err) throw err;
-
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    let gebruikersCol = db.db('TechTeam').collection('gebruikers');
-
-    favorietenCol.findOne({ id: 0 }).then(results => {
-      // haal IDs van opgeslagen gebruikers op => geef hele object terug
-      let users = [];
-      results.opgeslagen.forEach(gebNaam => {
-        users.push(gebruikersCol.findOne({ naam: gebNaam }));
-      });
-
-      // nadat alle gebruikers in de user array zitten => render pagina
-      Promise.all(users)
-        .then(data => {
-          res.render('favorieten', { gebruikersLijst: data });
-          db.close();
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    });
-  });
-}
-
-// -- post functions --
-
-function handleFavorieten(req, res) {
-  // reinstantiate client to prevent closed topology error
-  const client = new MongoClient(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
-
-  // voeg gebruikers ID aan favorieten toe
-  let gebNaam = req.body.gebruikerNaam;
-  client.connect(function (err, db) {
-    if (err) throw err;
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebNaam } })
-      .then(() => {
-        db.close();
-      });
-  });
-  setTimeout(() => {
-    res.redirect('back');
-  }, 70);
-}
-
-function handleFavorietenVerwijderen(req, res) {
-  // reinstantiate client to prevent closed topology error
-  const client = new MongoClient(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
-
-  // verwijder gebruikers ID van favorieten
-  let gebNaam = req.body.gebruikerNaam;
-  client.connect(function (err, db) {
-    if (err) throw err;
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $pull: { opgeslagen: gebNaam } })
-      .then(() => {
-        db.close();
-      });
-  });
-  setTimeout(() => {
-    res.redirect('back');
-  }, 70);
-}
+// --- handle post ---
 
 //als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
 app.post("/aanmelden", upload.single("image"), async (req, res) => {
@@ -405,7 +301,6 @@ function handleFavorieten(req, res) {
     res.redirect("back");
   }, 70);
 }
-
 
 //wijzigingen doorvoeren
 app.post("/wijzigen", uploadWijzig.single("wijzigimage"), async (req, res) => {
