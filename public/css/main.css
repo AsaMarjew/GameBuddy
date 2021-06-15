@@ -627,3 +627,65 @@ footer section a {
   background-color: var(--geel);
   color: var(--grijs);
 }
+
+/* BEGIN INLOGGEN */
+#inlog-form div {
+  display: flex;
+}
+
+#inlog-form div section {
+  display: grid;
+  width: 40%;
+}
+
+#inlog-form div section label {
+  font-family: Ubuntu;
+  color: var(--wit);
+  font-weight: 100;
+  margin-bottom: 2px;
+}
+
+#inlog-form div section input {
+  width: 100%;
+  padding: 8px 2px;
+  border: 0px;
+  margin-bottom: 60px;
+  background-color: var(--grijs);
+  border-bottom: 1px solid var(--geel);
+  color: var(--wit);
+}
+
+#inlog-form input[type='submit'] {
+  margin: auto;
+  display: flex;
+  padding: 10px 90px;
+  border-radius: 25px;
+  border: 0px;
+  background-color: var(--geel);
+  font-size: 1em;
+  letter-spacing: 2px;
+  cursor: pointer;
+  margin-top: 30px;
+  margin-bottom: 80px;
+}
+
+/* Uitloggen knop */
+.uitloggen {
+  margin: auto;
+  display: flex;
+  padding: 10px 90px;
+  border-radius: 25px;
+  border: 0px;
+  background-color: transparent;
+  border: 3px solid var(--geel);
+  color: var(--geel);
+  font-size: 1em;
+  letter-spacing: 2px;
+  cursor: pointer;
+  margin-top: 30px;
+  margin-bottom: 80px;
+}
+
+.dashboard {
+  color: #fff;
+}
