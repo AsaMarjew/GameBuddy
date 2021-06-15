@@ -8,7 +8,6 @@ const fetch = require('node-fetch');
 const session = require('express-session');
 const sessionID = 'unniqueSessionID';
 
-
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -151,10 +150,9 @@ app.get('/verwijderen', (req, res) => {
   }
 });
 
-
 // Weergave van de verwijdercheck pagina
 app.get('/verwijderencheck', (req, res) => {
-    let { userId } = req.session;
+  let { userId } = req.session;
   if (!userId) {
     res.render('index');
   } else {
@@ -162,18 +160,15 @@ app.get('/verwijderencheck', (req, res) => {
   }
 });
 
-
-
 // Weergave van de verwijderbericht pagina
 app.get('/verwijderenbericht', (req, res) => {
-    let { userId } = req.session;
+  let { userId } = req.session;
   if (!userId) {
     res.render('index');
   } else {
     res.redirect('verwijderenbericht');
   }
 });
-
 
 // Weergave van de verwijdernotfound pagina
 app.get('/verwijderennotfound', (req, res) => {
@@ -185,7 +180,6 @@ app.get('/verwijderennotfound', (req, res) => {
   }
 });
 
-
 // Weergave van de wijzigenbericht pagina
 app.get('/wijzigenbericht', (req, res) => {
   let { userId } = req.session;
@@ -195,7 +189,6 @@ app.get('/wijzigenbericht', (req, res) => {
     res.redirect('wijzigenbericht');
   }
 });
-
 
 //tutorial route
 app.get('/hoe-werkt-het', (req, res) => {
