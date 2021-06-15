@@ -24,6 +24,14 @@ a {
   color: var(--geel);
 }
 
+svg {
+  transition: 0.3s;
+}
+
+svg:hover {
+  font-size: 1.2em;
+}
+
 h1 {
   font-size: 1.8em;
   text-align: center;
@@ -42,6 +50,15 @@ h2 {
 
 body {
   background-color: #dcdcdc;
+}
+
+main {
+  text-align: center;
+  position: relative;
+}
+
+.wit {
+  color: var(--wit);
 }
 
 /* APP MAX 600 PX, MOBIEL FORMAAT */
@@ -125,11 +142,22 @@ footer {
   border-top: 1px solid var(--geel);
   padding: 10px;
   margin-top: 30px;
+  height: 38px;
+}
+
+footer section {
+  flex-basis: 25%;
+  text-align: center;
+  position: relative;
 }
 
 footer section a {
   font-size: 2em;
   color: var(--geel);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 /* EINDE FOOTER */
 
@@ -180,7 +208,7 @@ footer section a {
   margin-bottom: 75px !important;
 }
 
-#gameform input[type="submit"] {
+#gameform input[type='submit'] {
   margin: auto;
   display: flex;
   padding: 10px 90px;
@@ -379,18 +407,20 @@ footer section a {
 #zoeken-menu {
   color: var(--geel);
   font-size: 1.5em;
-  float: right;
   margin-top: -110px;
   margin-right: 20px;
   cursor: pointer;
+  height: 38px;
+  width: 150px;
+  display: flex;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
-#zoeken-menu span:first-child {
-  margin-right: 20px;
-}
-
-#zoeken-menu span:nth-child(2) {
-  margin-right: 15px;
+#zoeken-menu span {
+  position: relative;
+  flex-basis: 33%;
 }
 /* EINDE ZOEKEN */
 
