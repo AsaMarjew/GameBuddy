@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
+const multer = require('multer');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -12,6 +13,47 @@ const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
+});
+
+// --- Multer ---
+
+//afbeeldingen worden opgeslagen in de public/uploads map
+const storage = multer.diskStorage({
+  destination: function (request, file, callback) {
+    callback(null, './public/uploads');
+  },
+
+  //afbeeldingen krijgen naast de oorspronkelijke naam ook de huidige datum
+  filename: function (request, file, callback) {
+    callback(null, Date.now() + file.originalname);
+  },
+});
+
+//gewijzigde afbeeldingen
+const storageWijzig = multer.diskStorage({
+  destination: function (request, file, callback) {
+    callback(null, './public/uploads');
+  },
+
+  filename: function (request, file, callback) {
+    callback(null, Date.now() + file.originalname);
+  },
+});
+
+//uploaden en formaat limiet
+const upload = multer({
+  storage: storage,
+  limits: {
+    fieldSize: 1024 * 1024 * 3,
+  },
+});
+
+//gewijzigde afbeeldingen
+const uploadWijzig = multer({
+  storage: storageWijzig,
+  limits: {
+    fieldSize: 1024 * 1024 * 3,
+  },
 });
 
 //de css, img en js map in de public map gebruiken
@@ -75,6 +117,7 @@ app.get('/error', (req, res) => {
 // favorieten post
 app.post('/zoeken', handleFavorieten);
 app.post('/favorieten', handleFavorietenVerwijderen);
+app.post('/aanmelden', upload.single('image'), handleAanmelden);
 
 // -- routing functions --
 
@@ -188,40 +231,66 @@ function handleFavorietenVerwijderen(req, res) {
   }, 70);
 }
 
-//als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
-app.post('/aanmelden', (req, res) => {
+// nieuwe gebruiker object aanmaken
+async function handleAanmelden(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
 
-  console.log(req.body);
   client.connect((err, db) => {
     if (err) throw err;
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .insertOne({
-        naam: req.body.naam,
-        leeftijd: req.body.leeftijd,
-        email: req.body.email,
-        telefoon: req.body.telefoon,
-        console: req.body.console,
-        bio: req.body.bio,
-        game1: req.body.game1,
-        game2: req.body.game2,
-        game3: req.body.game3,
-        game4: req.body.game4,
-        img: req.body.image,
-      })
-      .then(() => {
-        db.close();
-        res.redirect('/zoeken');
-      })
-      .catch(err => {
-        console.log(err);
-      });
+
+    // als javascript aanstaat gebruik de compressed image als img, als js uitstaat gebruik multer voor img upload
+    if (req.body.img) {
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .insertOne({
+          naam: req.body.naam,
+          leeftijd: req.body.leeftijd,
+          email: req.body.email,
+          telefoon: req.body.telefoon,
+          console: req.body.console,
+          bio: req.body.bio,
+          game1: req.body.game1,
+          game2: req.body.game2,
+          game3: req.body.game3,
+          game4: req.body.game4,
+          img: req.body.img,
+        })
+        .then(() => {
+          db.close();
+          res.redirect('/zoeken');
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    } else {
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .insertOne({
+          naam: req.body.naam,
+          leeftijd: req.body.leeftijd,
+          email: req.body.email,
+          telefoon: req.body.telefoon,
+          console: req.body.console,
+          bio: req.body.bio,
+          game1: req.body.game1,
+          game2: req.body.game2,
+          game3: req.body.game3,
+          game4: req.body.game4,
+          img: `uploads/${req.file.filename}`,
+        })
+        .then(() => {
+          db.close();
+          res.redirect('/zoeken');
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
   });
-});
+}
 
 //filter optie
 app.post('/zoeken', async (req, res) => {

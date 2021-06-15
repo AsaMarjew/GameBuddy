@@ -10,7 +10,7 @@
   method="POST"
   action="/aanmelden"
   id="gameform"
-  enctype="X-www-form-urlencoded"
+  enctype="multipart/form-data"
 >
   <div>
     <section>
@@ -126,14 +126,16 @@
 
   <div>
     <section>
-      <input type="hidden" value="" name="image" id="imgInput" />
+      <input type="hidden" value="" name="img" id="imgOutput" />
 
       <label for="comp">Profielfoto</label>
       <input
         type="file"
+        name="image"
         id="comp"
         accept=".jpg, .jpeg, .png"
         onchange="compress()"
+        required
       />
     </section>
   </div>
