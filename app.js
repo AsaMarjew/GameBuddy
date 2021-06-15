@@ -58,12 +58,6 @@ const uploadWijzig = multer({
   },
 });
 
-//sessions
-// const store = new MongoDBStore({
-//   uri: uri,
-//   collections: 'sessions',
-// });
-
 const sessionID = 'unniqueSessionID';
 
 const redirectLogin = (req, res, next) => {
@@ -126,13 +120,17 @@ app.get('/', (req, res) => {
     res.redirect('dashboard');
     console.log(req.session);
   }
-
-  res.render('index');
 });
 
 //aanmelden route
 app.get('/aanmelden', (req, res) => {
-  res.render('aanmelden');
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('aanmelden');
+  } else {
+    res.redirect('dashboard');
+    console.log(req.session);
+  }
 });
 
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
