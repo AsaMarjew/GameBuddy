@@ -292,19 +292,34 @@ app.post('/verwijderen', async (req, res) => {
     res.redirect('/error');
   }
 });
+// --- ROUTING LOGIN ---
 
-// --- Login ---
-app.get('/inloggen', (req, res) => {
-  let { userId } = req.session;
-  if (!userId) {
-    res.render('inloggen');
-  } else {
-    res.redirect('dashboard');
-  }
-});
+//render login
+app.get('/inloggen', renderInloggen);
 
 //render dashboard
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', renderDashboard);
+
+//routing login
+app.post('/inloggen', inloggenPost);
+
+// routing logout
+app.post('/logout', logoutPost);
+
+// --- END ROUTING LOGIN ---
+
+//function logout post
+function logoutPost(req, res) {
+  req.session.destroy(err => {
+    if (err) {
+      return res.redirect('dashboard');
+    } else {
+      res.redirect('/');
+    }
+  });
+}
+// function render dashboard
+function renderDashboard(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -326,10 +341,19 @@ app.get('/dashboard', (req, res) => {
         });
     });
   }
-});
+}
 
-//login with session
-app.post('/inloggen', (req, res) => {
+//function render inloggen
+function renderInloggen(req, res) {
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('inloggen');
+  } else {
+    res.redirect('dashboard');
+  }
+}
+//function post inloggen with session
+function inloggenPost(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -356,18 +380,7 @@ app.post('/inloggen', (req, res) => {
       );
     }
   });
-});
-
-app.post('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      return res.redirect('dashboard');
-    } else {
-      res.redirect('/');
-    }
-  });
-});
-
+}
 //404
 app.use((req, res) => {
   res.status(404).render('404');
