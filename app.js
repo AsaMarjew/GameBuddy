@@ -122,6 +122,11 @@ app.get('/verwijderen', (req, res) => {
   res.render('verwijderen');
 });
 
+// Weergave van de verwijdercheck pagina
+app.get('/verwijderencheck', (req, res) => {
+  res.render('verwijderencheck');
+});
+
 // Weergave van de verwijderbericht pagina
 app.get('/verwijderenbericht', (req, res) => {
   res.render('verwijderenbericht');
@@ -164,6 +169,7 @@ app.post('/aanmelden', upload.single('image'), async (req, res) => {
         naam: req.body.naam,
         leeftijd: req.body.leeftijd,
         email: req.body.email,
+        wachtwoord: req.body.wachtwoordaanmelden,
         telefoon: req.body.telefoon,
         console: req.body.console,
         bio: req.body.bio,
@@ -231,6 +237,7 @@ async function wijzigen(req, res) {
             naam: req.body.wijzignaam,
             leeftijd: req.body.wijzigleeftijd,
             email: req.body.wijzigemail,
+            wachtwoord: req.body.wijzigwachtwoordaanmelden,
             telefoon: req.body.wijzigtelefoon,
             console: req.body.wijzigconsole,
             bio: req.body.wijzigbio,
@@ -245,7 +252,7 @@ async function wijzigen(req, res) {
       .then(() => {
         var mailOpties = {
           from: 'gamebuddyteamtech@gmail.com',
-          to: 'asa@marjew.nl',
+          to: email,
           subject: 'GameBuddy App - Accountwijziging',
           text: 'Je GameBuddy account is gewijzigd!',
           attachments: [
@@ -290,7 +297,7 @@ function verwijderen(req, res) {
         } else if (doc) {
           var mailOpties = {
             from: 'gamebuddyteamtech@gmail.com',
-            to: 'asa@marjew.nl',
+            to: email,
             subject: 'GameBuddy App - Accountwijziging',
             text: 'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
             attachments: [
