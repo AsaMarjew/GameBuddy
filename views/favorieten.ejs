@@ -1,14 +1,12 @@
-<div id="zoeken-menu">
-  <span id="verwijderen"
-    ><a href="/verwijderen"><i class="fas fa-trash"></i></a
+<div class="hometerug">
+  <span id="terug"
+    ><a href="/"><i class="fas fa-chevron-left"></i></a
   ></span>
-  <span id="instellingen"
-    ><a href="/wijzigen"><i class="fas fa-cog"></i></a
-  ></span>
-  <span id="filter"><i class="fas fa-filter"></i></span>
 </div>
 
-<%gebruikersLijst.forEach(gebruiker => {%>
+<h1>Favorieten</h1>
+
+<% if(gebruikersLijst.length > 0) { gebruikersLijst.forEach(gebruiker => { %>
 <div class="card" data-aos="fade-up">
   <div>
     <section>
@@ -17,32 +15,29 @@
         <p>(<%= gebruiker.leeftijd %>)</p></span
       >
     </section>
-
     <section>
       <img
-        src="<%- gebruiker.img %>"
+        src="<%= gebruiker.img %>"
         alt="Geen gekozen profielfoto"
         class="avatarimg"
       />
     </section>
-
     <section>
       <p><%= gebruiker.bio %></p>
     </section>
 
     <section>
-      <form method="post" action="/zoeken">
+      <form method="post" action="/favorieten">
         <input
           type="hidden"
           value="<%- gebruiker.naam %>"
           name="gebruikerNaam"
         />
         <input type="submit" class="favorietenButton" value="" />
-        <i class="fas fa-heart"></i>
+        <i class="fas fa-heart-broken"></i>
       </form>
     </section>
   </div>
-
   <div>
     <section>
       <img
@@ -51,7 +46,6 @@
         class="consoleimg"
       />
     </section>
-
     <section>
       <span
         ><i class="fab fa-whatsapp-square"></i>
@@ -60,7 +54,6 @@
         ></span
       >
     </section>
-
     <section>
       <img
         src="img/game/<%= gebruiker.game1 %>.svg"
@@ -85,25 +78,8 @@
     </section>
   </div>
 </div>
-
-<%})%>
-
-<div id="filteren">
-  <span id="filterensluiten"><i class="fas fa-times-circle"></i></span>
-
-  <div>
-    <h1>Filteren</h1>
-    <form method="POST" action="/zoeken" id="gameform">
-      <label for="consolefilter">Console</label>
-      <select name="consolefilter" id="consolefilter">
-        <option value="Alle">Alle</option>
-        <option value="pc">PC</option>
-        <option value="ps4">PlayStation 4</option>
-        <option value="ps5">PlayStation 5</option>
-        <option value="xboxone">Xbox One</option>
-        <option value="xboxseriesx">Xbox Series X</option>
-      </select>
-      <input type="submit" value="Filteren" />
-    </form>
-  </div>
-</div>
+<%})} else { %>
+<p class="big wit">Het lijkt erop dat je nog geen favorieten hebt.</p>
+<i class="empty fas fa-heart-broken"></i>
+<p class="wit">Ga naar <a href="/zoeken">zoeken</a> om vrienden te maken!</p>
+<% } %>
