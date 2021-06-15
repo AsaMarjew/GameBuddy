@@ -24,12 +24,11 @@ a {
   color: var(--geel);
 }
 
-p {
-  color: white;
+svg {
+  transition: 0.3s;
 }
 
 svg:hover {
-  transition: 0.3s;
   font-size: 1.2em;
 }
 
@@ -55,6 +54,11 @@ body {
 
 main {
   text-align: center;
+  position: relative;
+}
+
+.wit {
+  color: var(--wit);
 }
 
 /* APP MAX 600 PX, MOBIEL FORMAAT */
@@ -76,6 +80,7 @@ header a {
   display: grid;
   text-align: center;
   margin-top: 50px;
+  position: relative;
 }
 
 .home img {
@@ -153,10 +158,6 @@ footer section a {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-}
-
-footer section svg {
-  transition: 0.3s;
 }
 /* EINDE FOOTER */
 
@@ -406,18 +407,20 @@ footer section svg {
 #zoeken-menu {
   color: var(--geel);
   font-size: 1.5em;
-  float: right;
   margin-top: -110px;
   margin-right: 20px;
   cursor: pointer;
+  height: 38px;
+  width: 150px;
+  display: flex;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
-#zoeken-menu span:first-child {
-  margin-right: 20px;
-}
-
-#zoeken-menu span:nth-child(2) {
-  margin-right: 15px;
+#zoeken-menu span {
+  position: relative;
+  flex-basis: 33%;
 }
 /* EINDE ZOEKEN */
 
@@ -520,3 +523,84 @@ footer section svg {
   cursor: pointer;
 }
 /* EINDE HOEWERKTHET */
+
+/* FIFA API */
+#fortniteknop {
+  position: absolute;
+  right: 5px;
+  top: -150px;
+}
+
+#fortniteknop a img {
+  border-radius: 50px;
+}
+
+#fortniteknop p {
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  font-size: 0.8em;
+}
+
+.fortnite ul {
+  width: 60%;
+  margin: 50px auto;
+  padding: 10px 20px;
+  list-style: none;
+  border-radius: 5px;
+}
+
+.fortnite ul:nth-child(even) {
+  background-color: #95e8b1;
+}
+
+.fortnite ul:nth-child(odd) {
+  background-color: var(--wit);
+}
+
+.fortnite ul li img {
+  width: 250px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.fortnite ul li:nth-child(2) {
+  font-weight: 900;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.fortnite ul li:nth-child(3) {
+  margin-bottom: 10px;
+}
+
+.fortnite ul li:nth-child(4) {
+  font-size: 0.7em;
+  color: var(--grijs);
+}
+
+.fortnite h1 {
+  margin-bottom: 0px;
+}
+
+.fortnite p {
+  color: var(--wit);
+  padding: 50px;
+}
+
+.fortnite ul li a {
+  background-color: var(--lichtgrijs);
+  color: var(--grijs);
+  padding: 10px;
+  display: block;
+  text-align: center;
+  margin: 20px auto;
+  border-radius: 20px;
+  text-decoration: none;
+  width: 70%;
+}
+
+.fortnite ul li:last-child a {
+  background-color: var(--geel);
+  color: var(--grijs);
+}

@@ -3,6 +3,7 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const bodyParser = require('body-parser');
+const fetch = require('node-fetch');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -86,8 +87,11 @@ app.get('/aanmelden', (req, res) => {
   res.render('aanmelden');
 });
 
-//zoeken route
+//zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
 app.get('/zoeken', renderZoeken);
+
+// favorieten route
+app.get('/favorieten', renderFavorieten);
 
 //wijzigen route
 app.get('/wijzigen', (req, res) => {
@@ -99,9 +103,6 @@ app.get('/verwijderen', (req, res) => {
   res.render('verwijderen');
 });
 
-// favorieten route
-app.get('/favorieten', renderFavorieten);
-
 //tutorial route
 app.get('/hoe-werkt-het', (req, res) => {
   res.render('hoewerkthet');
@@ -112,10 +113,13 @@ app.get('/error', (req, res) => {
   res.render('error');
 });
 
+// api get
+app.get('/fortnite', renderApi);
+
 // --- post ---
 
-// favorieten post
-app.post('/zoeken', handleFavorieten);
+// filter post
+app.post('/zoeken', handleZoeken);
 app.post('/favorieten', handleFavorietenVerwijderen);
 
 // -- routing functions --
@@ -182,7 +186,154 @@ function renderFavorieten(req, res) {
   });
 }
 
-// -- post functions --
+async function renderApi(req, res) {
+  // --- fortnite API ---
+  const fortniteApi = await fetch(
+    'https://fortnite-api.theapinetwork.com/items/list'
+  )
+    .then(res => res.json())
+    .then(json => {
+      console.log('test');
+
+      //GEGEVENS 0
+      const naam0 = json.data[3].item.name;
+      const desc0 = json.data[3].item.description;
+      const type0 = json.data[3].item.type;
+      const img0 = json.data[3].item.images.background;
+      var array0 = [naam0, desc0, type0];
+
+      //GEGEVENS 1
+      const naam1 = json.data[5].item.name;
+      const desc1 = json.data[5].item.description;
+      const type1 = json.data[5].item.type;
+      const img1 = json.data[5].item.images.background;
+      var array1 = [naam1, desc1, type1];
+
+      //GEGEVENS 2
+      const naam2 = json.data[6].item.name;
+      const desc2 = json.data[6].item.description;
+      const type2 = json.data[6].item.type;
+      const img2 = json.data[6].item.images.background;
+      var array2 = [naam2, desc2, type2];
+
+      //GEGEVENS 3
+      const naam3 = json.data[10].item.name;
+      const desc3 = json.data[10].item.description;
+      const type3 = json.data[10].item.type;
+      const img3 = json.data[10].item.images.background;
+      var array3 = [naam3, desc3, type3];
+
+      //GEGEVENS 4
+      const naam4 = json.data[12].item.name;
+      const desc4 = json.data[12].item.description;
+      const type4 = json.data[12].item.type;
+      const img4 = json.data[12].item.images.background;
+      var array4 = [naam4, desc4, type4];
+
+      res.render('fortnite', {
+        array0: array0,
+        img0: img0,
+        array1: array1,
+        img1: img1,
+        array2: array2,
+        img2: img2,
+        array3: array3,
+        img3: img3,
+        array4: array4,
+        img4: img4,
+      });
+    });
+}
+
+// -- handle post --
+
+//als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
+app.post('/aanmelden', upload.single('image'), async (req, res) => {
+  //console.log(request.file);
+  client.connect((err, db) => {
+    if (err) throw err;
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .insertOne({
+        naam: req.body.naam,
+        leeftijd: req.body.leeftijd,
+        email: req.body.email,
+        telefoon: req.body.telefoon,
+        console: req.body.console,
+        bio: req.body.bio,
+        game1: req.body.game1,
+        game2: req.body.game2,
+        game3: req.body.game3,
+        game4: req.body.game4,
+        img: req.file.filename,
+      })
+      .then(() => {
+        db.close();
+        res.redirect('/zoeken');
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
+});
+
+function handleZoeken(req, res) {
+  //nieuwe variabel gebruikersnaam uit favorieten
+  let gebNaam = req.body.gebruikerNaam;
+
+  //check of de favorieten gebruikersnaam bestaat
+  if (gebNaam) {
+    handleFavorieten(req, res);
+    //als het niet bestaat wordt filteren uitgevoerd
+  } else {
+    handleFilteren(req, res);
+  }
+}
+
+//filter optie
+function handleFilteren(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  //gekozen console optie door de gebruiker
+  const consoleFilter = req.body.consolefilter;
+
+  //connectie database
+  client.connect((err, db) => {
+    if (err) throw err;
+
+    //nieuwe lege query
+    let query = {};
+
+    //als gebruiker op de optie alle klikt wordt er een lege query verstuurd
+    if (consoleFilter === 'Alle') {
+      query = {};
+      //als de gebruiker een console kiest wordt de console uit de form in de query gezet
+    } else {
+      query = {
+        console: consoleFilter,
+      };
+    }
+
+    //verbinding met db en de collectie
+    db.db('TechTeam')
+      .collection('gebruikers')
+      //in de db wordt met de query gezocht
+      .find(query)
+      //resultaten worden in een array gezet
+      .toArray(function (err, gebruikers) {
+        if (err) throw err;
+        //de gegevens worden gerenderd
+        res.render('zoeken', {
+          gebruikersLijst: gebruikers,
+          consoleFilter,
+        });
+        db.close();
+      });
+  });
+}
 
 function handleFavorieten(req, res) {
   // reinstantiate client to prevent closed topology error
@@ -193,6 +344,7 @@ function handleFavorieten(req, res) {
 
   // voeg gebruikers ID aan favorieten toe
   let gebNaam = req.body.gebruikerNaam;
+  console.log(gebNaam);
   client.connect(function (err, db) {
     if (err) throw err;
     let favorietenCol = db.db('TechTeam').collection('favorieten');
@@ -229,62 +381,6 @@ function handleFavorietenVerwijderen(req, res) {
     res.redirect('back');
   }, 70);
 }
-
-//als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
-app.post('/aanmelden', upload.single('image'), async (req, res) => {
-  //console.log(request.file);
-  client.connect((err, db) => {
-    if (err) throw err;
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .insertOne({
-        naam: req.body.naam,
-        leeftijd: req.body.leeftijd,
-        email: req.body.email,
-        telefoon: req.body.telefoon,
-        console: req.body.console,
-        bio: req.body.bio,
-        game1: req.body.game1,
-        game2: req.body.game2,
-        game3: req.body.game3,
-        game4: req.body.game4,
-        img: req.file.filename,
-      })
-      .then(() => {
-        db.close();
-        res.redirect('/zoeken');
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  });
-});
-
-//filter optie
-app.post('/zoeken', async (req, res) => {
-  const consoleFilter = req.body.consolefilter;
-  //lege query voor als alle aangevingt is
-  let query = {};
-
-  if (consoleFilter === 'Alle') {
-    query = {};
-
-    //query met de gekozen fitler optie uit de dropdown in de filter menu
-  } else {
-    query = {
-      console: consoleFilter,
-    };
-  }
-
-  //lean zet het om in mongo objecten
-  const gebruikers = await gebruiker.find(query).lean();
-
-  //gebruikerslijst sturen en de filter optie
-  res.render('zoeken', {
-    gebruikersLijst: gebruikers,
-    consoleFilter,
-  });
-});
 
 //wijzigingen doorvoeren
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
