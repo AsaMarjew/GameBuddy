@@ -3,6 +3,7 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
 const fetch = require('node-fetch');
 
 const app = express();
@@ -73,7 +74,14 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// database connectie mongo-db
+// Nodemailer - Hier wordt de nodemailer opgezet en wordt er ingelogd op het adres waar emails van verzonden worden
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'gamebuddyteamtech@gmail.com',
+    pass: 'teamtech123',
+  },
+});
 
 // --- routing ---
 
@@ -101,6 +109,26 @@ app.get('/wijzigen', (req, res) => {
 //verwijderen route
 app.get('/verwijderen', (req, res) => {
   res.render('verwijderen');
+});
+
+// Weergave van de verwijdercheck pagina
+app.get('/verwijderencheck', (req, res) => {
+  res.render('verwijderencheck');
+});
+
+// Weergave van de verwijderbericht pagina
+app.get('/verwijderenbericht', (req, res) => {
+  res.render('verwijderenbericht');
+});
+
+// Weergave van de verwijdernotfound pagina
+app.get('/verwijderennotfound', (req, res) => {
+  res.render('verwijderennotfound');
+});
+
+// Weergave van de wijzigenbericht pagina
+app.get('/wijzigenbericht', (req, res) => {
+  res.render('wijzigenbericht');
 });
 
 //tutorial route
@@ -247,36 +275,6 @@ async function renderApi(req, res) {
 }
 
 // -- handle post --
-
-//als er een nieuwe oproep geplaatst wordt, wordt de variabel gebruiker gevuld
-app.post('/aanmelden', upload.single('image'), async (req, res) => {
-  //console.log(request.file);
-  client.connect((err, db) => {
-    if (err) throw err;
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .insertOne({
-        naam: req.body.naam,
-        leeftijd: req.body.leeftijd,
-        email: req.body.email,
-        telefoon: req.body.telefoon,
-        console: req.body.console,
-        bio: req.body.bio,
-        game1: req.body.game1,
-        game2: req.body.game2,
-        game3: req.body.game3,
-        game4: req.body.game4,
-        img: req.file.filename,
-      })
-      .then(() => {
-        db.close();
-        res.redirect('/zoeken');
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  });
-});
 
 function handleZoeken(req, res) {
   //nieuwe variabel gebruikersnaam uit favorieten
@@ -446,61 +444,118 @@ async function handleAanmelden(req, res) {
   });
 }
 
-//wijzigingen doorvoeren
-app.post('/wijzigen', async (req, res) => {
-  try {
-    //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
-    client.connect((err, db) => {
-      if (err) throw err;
-      db.db('TechTeam')
-        .collection('gebruikers')
-        .findOneAndUpdate()
-        .then(() => {
-          db.close();
-          res.redirect('/zoeken');
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    });
+// Wijzigingen doorvoeren
+app.post('/wijzigen', uploadWijzig.single('wijzigimage'), wijzigen);
 
-    const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
-    doc.overwrite({
-      naam: req.body.wijzignaam,
-      leeftijd: req.body.wijzigleeftijd,
-      email: req.body.wijzigemail,
-      telefoon: req.body.wijzigtelefoon,
-      console: req.body.wijzigconsole,
-      bio: req.body.wijzigbio,
-      game1: req.body.wijziggame1,
-      game2: req.body.wijziggame2,
-      game3: req.body.wijziggame3,
-      game4: req.body.wijziggame4,
-      img: req.body.image,
-    });
+async function wijzigen(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
 
-    //de updates worden opgeslagen
-    await doc.save();
-    res.redirect('/zoeken');
+  const email = req.body.wijzigemail;
 
-    //bij een error wordt de gebruiker doorverwezen naar de error pagina
-  } catch (err) {
-    console.log(err);
-    res.redirect('/error');
-  }
-});
+  client.connect((err, db) => {
+    if (err) throw err;
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOneAndUpdate(
+        { email: email },
+        {
+          $set: {
+            naam: req.body.wijzignaam,
+            leeftijd: req.body.wijzigleeftijd,
+            email: req.body.wijzigemail,
+            wachtwoord: req.body.wijzigwachtwoordaanmelden,
+            telefoon: req.body.wijzigtelefoon,
+            console: req.body.wijzigconsole,
+            bio: req.body.wijzigbio,
+            game1: req.body.wijziggame1,
+            game2: req.body.wijziggame2,
+            game3: req.body.wijziggame3,
+            game4: req.body.wijziggame4,
+            img: req.file.filename,
+          },
+        }
+      )
+      .then(() => {
+        var mailOpties = {
+          from: 'gamebuddyteamtech@gmail.com',
+          to: email,
+          subject: 'GameBuddy App - Accountwijziging',
+          text: 'Je GameBuddy account is gewijzigd!',
+          attachments: [
+            {
+              filename: 'Logo.png',
+              path: __dirname + '/public/img/logo.ico',
+              cid: 'logo',
+            },
+          ],
+        };
 
-//met deletemany worden alle records van de object verwijderd, aan de hand van de email
-app.post('/verwijderen', async (req, res) => {
-  try {
-    await gebruiker.deleteMany({
-      email: req.body.verwijderemail,
-    });
-    res.redirect('/zoeken');
-  } catch (err) {
-    res.redirect('/error');
-  }
-});
+        mailer(mailOpties);
+        db.close();
+        res.redirect('/wijzigenbericht');
+      })
+      .catch(err => {
+        console.log(err);
+        res.redirect('/error');
+      });
+  });
+}
+
+/*  Met de functie verwijderen worden documenten verwijderd uit de database.
+    Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
+app.post('/verwijderen', verwijderen);
+
+function verwijderen(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  const email = req.body.verwijderemail;
+
+  client.connect((err, db) => {
+    const collection = db.db('TechTeam').collection('gebruikers');
+    collection
+      .find({ email: email }, { $exists: true })
+      .toArray(function (err, doc) {
+        if (doc.length === 0) {
+          res.redirect('/verwijderennotfound');
+        } else if (doc) {
+          var mailOpties = {
+            from: 'gamebuddyteamtech@gmail.com',
+            to: email,
+            subject: 'GameBuddy App - Accountwijziging',
+            text: 'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
+            attachments: [
+              {
+                filename: 'Logo.png',
+                path: __dirname + '/public/img/logo.ico',
+                cid: 'logo',
+              },
+            ],
+          };
+
+          mailer(mailOpties);
+          collection.deleteMany({ email: email });
+          res.redirect('/verwijderenbericht');
+        }
+      });
+  });
+}
+
+// Functie die mail opties meekrijgt en alleen de mail verstuurd naar de gebruiker
+function mailer(Optie) {
+  transporter.sendMail(Optie, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+}
 
 //404
 app.use(function (req, res) {

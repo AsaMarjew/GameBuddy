@@ -525,7 +525,29 @@ footer section a {
 }
 /* EINDE HOEWERKTHET */
 
-/* FIFA API */
+
+/* BEGIN VERWIJDERENBERICHT PAGINA */
+.verButton {
+  margin: auto;
+  display: flex;
+  padding: 10px 90px;
+  border-radius: 25px;
+  border: 0px;
+  background-color: var(--geel);
+  font-size: 1em;
+  letter-spacing: 2px;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.verTekst {
+  color: white;
+  text-align: center;
+  margin: 50px;
+}
+/* EINDE VERWIJDERENBERICHT PAGINA */
+
+/* FORTNITE API */
 #fortniteknop {
   position: absolute;
   right: 5px;
