@@ -286,6 +286,7 @@ footer section a {
   height: 110px;
   border-radius: 100px;
   margin: 20px 0px;
+  object-fit: cover;
 }
 
 .card div:last-child {
