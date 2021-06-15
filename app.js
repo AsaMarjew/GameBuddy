@@ -325,7 +325,6 @@ function handleFilteren(req, res) {
       //resultaten worden in een array gezet
       .toArray(function (err, gebruikers) {
         if (err) throw err;
-        console.log(gebruikers);
         //de gegevens worden gerenderd
         res.render('zoeken', {
           gebruikersLijst: gebruikers,
