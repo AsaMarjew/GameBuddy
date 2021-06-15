@@ -106,13 +106,11 @@ app.use(
 
 // render index
 app.get('/', (req, res) => {
-  console.log(req.session);
   let { userId } = req.session;
   if (!userId) {
     res.render('index');
   } else {
     res.redirect('dashboard');
-    console.log(req.session);
   }
 });
 
@@ -135,33 +133,69 @@ app.get('/favorieten', renderFavorieten);
 
 //wijzigen route
 app.get('/wijzigen', (req, res) => {
-  res.render('wijzigen');
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('wijzigen');
+  }
 });
 
 //verwijderen route
 app.get('/verwijderen', (req, res) => {
-  res.render('verwijderen');
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('verwijderen');
+  }
 });
+
 
 // Weergave van de verwijdercheck pagina
 app.get('/verwijderencheck', (req, res) => {
-  res.render('verwijderencheck');
+    let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('verwijderencheck');
+  }
 });
+
+
 
 // Weergave van de verwijderbericht pagina
 app.get('/verwijderenbericht', (req, res) => {
-  res.render('verwijderenbericht');
+    let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('verwijderenbericht');
+  }
 });
+
 
 // Weergave van de verwijdernotfound pagina
 app.get('/verwijderennotfound', (req, res) => {
-  res.render('verwijderennotfound');
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('verwijderennotfound');
+  }
 });
+
 
 // Weergave van de wijzigenbericht pagina
 app.get('/wijzigenbericht', (req, res) => {
-  res.render('wijzigenbericht');
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('wijzigenbericht');
+  }
 });
+
 
 //tutorial route
 app.get('/hoe-werkt-het', (req, res) => {
