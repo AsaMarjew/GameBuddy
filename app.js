@@ -121,6 +121,7 @@ app.get('/fortnite', renderApi);
 // filter post
 app.post('/zoeken', handleZoeken);
 app.post('/favorieten', handleFavorietenVerwijderen);
+app.post('/aanmelden', upload.single('image'), handleAanmelden);
 
 // -- routing functions --
 
@@ -382,8 +383,71 @@ function handleFavorietenVerwijderen(req, res) {
   }, 70);
 }
 
+// nieuwe gebruiker object aanmaken
+async function handleAanmelden(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  client.connect((err, db) => {
+    if (err) throw err;
+
+    // als javascript aanstaat gebruik de compressed image als img, als js uitstaat gebruik multer voor img upload
+    if (req.body.img) {
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .insertOne({
+          naam: req.body.naam,
+          leeftijd: req.body.leeftijd,
+          email: req.body.email,
+          wachtwoord: req.body.wachtwoordaanmelden,
+          telefoon: req.body.telefoon,
+          console: req.body.console,
+          bio: req.body.bio,
+          game1: req.body.game1,
+          game2: req.body.game2,
+          game3: req.body.game3,
+          game4: req.body.game4,
+          img: req.body.img,
+        })
+        .then(() => {
+          db.close();
+          res.redirect('/zoeken');
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    } else {
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .insertOne({
+          naam: req.body.naam,
+          leeftijd: req.body.leeftijd,
+          email: req.body.email,
+          wachtwoord: req.body.wachtwoordaanmelden,
+          telefoon: req.body.telefoon,
+          console: req.body.console,
+          bio: req.body.bio,
+          game1: req.body.game1,
+          game2: req.body.game2,
+          game3: req.body.game3,
+          game4: req.body.game4,
+          img: `uploads/${req.file.filename}`,
+        })
+        .then(() => {
+          db.close();
+          res.redirect('/zoeken');
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  });
+}
+
 //wijzigingen doorvoeren
-app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
+app.post('/wijzigen', async (req, res) => {
   try {
     //zoeken naar de juiste gebruiker aan de hand van de email die de gebruiker invoert
     client.connect((err, db) => {
@@ -400,24 +464,24 @@ app.post('/wijzigen', uploadWijzig.single('wijzigimage'), async (req, res) => {
         });
     });
 
-    // const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
-    // doc.overwrite({
-    //   naam: req.body.wijzignaam,
-    //   leeftijd: req.body.wijzigleeftijd,
-    //   email: req.body.wijzigemail,
-    //   telefoon: req.body.wijzigtelefoon,
-    //   console: req.body.wijzigconsole,
-    //   bio: req.body.wijzigbio,
-    //   game1: req.body.wijziggame1,
-    //   game2: req.body.wijziggame2,
-    //   game3: req.body.wijziggame3,
-    //   game4: req.body.wijziggame4,
-    //   img: req.file.filename,
-    // });
+    const doc = await gebruiker.findOne({ email: req.body.wijzigemail });
+    doc.overwrite({
+      naam: req.body.wijzignaam,
+      leeftijd: req.body.wijzigleeftijd,
+      email: req.body.wijzigemail,
+      telefoon: req.body.wijzigtelefoon,
+      console: req.body.wijzigconsole,
+      bio: req.body.wijzigbio,
+      game1: req.body.wijziggame1,
+      game2: req.body.wijziggame2,
+      game3: req.body.wijziggame3,
+      game4: req.body.wijziggame4,
+      img: req.body.image,
+    });
 
-    // //de updates worden opgeslagen
-    // await doc.save();
-    // res.redirect('/zoeken');
+    //de updates worden opgeslagen
+    await doc.save();
+    res.redirect('/zoeken');
 
     //bij een error wordt de gebruiker doorverwezen naar de error pagina
   } catch (err) {
