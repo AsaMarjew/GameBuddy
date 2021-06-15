@@ -5,6 +5,9 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const fetch = require('node-fetch');
+const session = require('express-session');
+const sessionID = 'unniqueSessionID';
+
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -83,16 +86,45 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// use the session middleware
+app.use(
+  session({
+    name: sessionID,
+    resave: false,
+    saveUninitialized: false,
+    // store: store,
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+      maxAge: 1000 * 60 * 30,
+      sameSite: true,
+      // duration before the session is lost = 30 min
+    },
+  })
+);
+
 // --- routing ---
 
 // render index
-app.get('', (req, res) => {
-  res.render('index');
+app.get('/', (req, res) => {
+  console.log(req.session);
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.redirect('dashboard');
+    console.log(req.session);
+  }
 });
 
 //aanmelden route
 app.get('/aanmelden', (req, res) => {
-  res.render('aanmelden');
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('aanmelden');
+  } else {
+    res.redirect('dashboard');
+    console.log(req.session);
+  }
 });
 
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
@@ -143,6 +175,22 @@ app.get('/error', (req, res) => {
 
 // api get
 app.get('/fortnite', renderApi);
+
+// --- ROUTING LOGIN ---
+
+//render login
+app.get('/inloggen', renderInloggen);
+
+//render dashboard
+app.get('/dashboard', renderDashboard);
+
+//routing login
+app.post('/inloggen', inloggenPost);
+
+// routing logout
+app.post('/logout', logoutPost);
+
+// --- END ROUTING LOGIN ---
 
 // --- post ---
 
@@ -553,6 +601,80 @@ function mailer(Optie) {
       console.log(error);
     } else {
       console.log('Email sent: ' + info.response);
+    }
+  });
+}
+
+//function logout post
+function logoutPost(req, res) {
+  req.session.destroy(err => {
+    if (err) {
+      return res.redirect('dashboard');
+    } else {
+      res.redirect('/');
+    }
+  });
+}
+// function render dashboard
+function renderDashboard(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+  let { userId } = req.session;
+  if (!userId) {
+    res.redirect('inloggen');
+  } else {
+    client.connect((err, db) => {
+      if (err) throw err;
+
+      db.db('TechTeam')
+        .collection('gebruikers')
+        .findOne({ naam: req.session.naam })
+        .then(() => {
+          res.render('dashboard', { gebruikersLijst: req.session.userId });
+          console.log(req.session.userId);
+          db.close();
+        });
+    });
+  }
+}
+
+//function render inloggen
+function renderInloggen(req, res) {
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('inloggen');
+  } else {
+    res.redirect('dashboard');
+  }
+}
+//function post inloggen with session
+function inloggenPost(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+  client.connect((err, db) => {
+    let gebruikers = db.db('TechTeam').collection('gebruikers');
+    const email = req.body.emailInloggen;
+    const password = req.body.wachtwoordInloggen;
+
+    if (email && password) {
+      gebruikers.findOne(
+        {
+          email: email,
+          wachtwoord: password,
+        },
+        (err, data) => {
+          if (err) {
+            next(err);
+          } else {
+            req.session.userId = data;
+            res.redirect('/dashboard');
+          }
+        }
+      );
     }
   });
 }
