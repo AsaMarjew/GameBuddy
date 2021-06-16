@@ -12,7 +12,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // DB Setup
-const { MongoClient } = require("mongodb");
+const { MongoClient } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
@@ -119,8 +120,7 @@ app.get("/aanmelden", (req, res) => {
   if (!userId) {
     res.render("aanmelden");
   } else {
-    res.redirect("dashboard");
-    console.log(req.session);
+    res.redirect('dashboard');
   }
 });
 
@@ -238,16 +238,17 @@ async function renderZoeken(req, res) {
     client.connect(async (err, db) => {
       if (err) throw err;
 
-      const gebruikersCol = db.db("TechTeam").collection("gebruikers");
-      const favorietenCol = db.db("TechTeam").collection("favorieten");
+      const gebruikersCol = db.db('TechTeam').collection('gebruikers');
 
-      // haal alle gebruikers op en opgeslagen gebruikers
+      // haal de huidige gebruiker op en een array van alle gebruikers
       let users = await gebruikersCol.find().toArray();
-      const favorites = await favorietenCol.findOne({ id: 0 });
+      const user = await gebruikersCol.findOne({
+        email: req.session.userId.email,
+      });
 
       // maak nieuwe array waar opgeslagen gebruikers niet instaan
-      let undiscoveredUsers = users.filter((gebruiker) => {
-        return !favorites.opgeslagen.includes(gebruiker.naam);
+      let undiscoveredUsers = users.filter(gebruiker => {
+        return !user.favorieten.includes(gebruiker.email);
       });
 
       res.render("zoeken", { gebruikersLijst: undiscoveredUsers });
@@ -266,27 +267,28 @@ function renderFavorieten(req, res) {
 
   client.connect((err, db) => {
     if (err) throw err;
-
-    let favorietenCol = db.db("TechTeam").collection("favorieten");
-    let gebruikersCol = db.db("TechTeam").collection("gebruikers");
-
-    favorietenCol.findOne({ id: 0 }).then((results) => {
-      // haal IDs van opgeslagen gebruikers op => geef hele object terug
-      let users = [];
-      results.opgeslagen.forEach((gebNaam) => {
-        users.push(gebruikersCol.findOne({ naam: gebNaam }));
-      });
-
-      // nadat alle gebruikers in de user array zitten => render pagina
-      Promise.all(users)
-        .then((data) => {
-          res.render("favorieten", { gebruikersLijst: data });
-          db.close();
-        })
-        .catch((err) => {
-          console.log(err);
+    
+    // haal huidige gebruiker op
+    const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+    gebruikersCol
+      .findOne({ email: req.session.userId.email })
+      .then(gebruiker => {
+        let users = [];
+        // push alle favorieten gebruikers in een array
+        gebruiker.favorieten.forEach(email => {
+          users.push(gebruikersCol.findOne({ email: email }));
         });
-    });
+
+        // nadat alle gebruikers in de user array zitten => render pagina
+        Promise.all(users)
+          .then(data => {
+            res.render('favorieten', { gebruikersLijst: data });
+            db.close();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      });
   });
 }
 
@@ -334,13 +336,13 @@ async function renderApi(req, res) {
 // -- handle post --
 
 function handleZoeken(req, res) {
-  //nieuwe variabel gebruikersnaam uit favorieten
-  let gebNaam = req.body.gebruikerNaam;
+  //nieuwe variabel gebruikerEmail uit favorieten
+  let gebEmail = req.body.gebruikerEmail;
 
-  //check of de favorieten gebruikersnaam bestaat
-  if (gebNaam) {
+  //check of de favorieten gebruikerEmail bestaat
+  if (gebEmail) {
     handleFavorieten(req, res);
-    //als het niet bestaat wordt filteren uitgevoerd
+    //als het niet bestaat wordt filteren uitgevoerd ipv favorieten
   } else {
     handleFilteren(req, res);
   }
@@ -398,14 +400,17 @@ function handleFavorieten(req, res) {
     useNewUrlParser: true,
   });
 
-  // voeg gebruikers ID aan favorieten toe
-  let gebNaam = req.body.gebruikerNaam;
-  console.log(gebNaam);
-  client.connect(function (err, db) {
+  // voeg gebruikers email aan favorieten van huidige gebruiker toe
+  let gebEmail = req.body.gebruikerEmail;
+
+  client.connect(async (err, db) => {
     if (err) throw err;
-    let favorietenCol = db.db("TechTeam").collection("favorieten");
-    favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebNaam } })
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOneAndUpdate(
+        { email: req.session.userId.email },
+        { $push: { favorieten: gebEmail } }
+      )
       .then(() => {
         db.close();
       });
@@ -422,13 +427,17 @@ function handleFavorietenVerwijderen(req, res) {
     useNewUrlParser: true,
   });
 
-  // verwijder gebruikers ID van favorieten
-  let gebNaam = req.body.gebruikerNaam;
-  client.connect(function (err, db) {
+  // verwijder gebruikers email uit favorieten van huidige gebruiker
+  let gebEmail = req.body.gebruikerEmail;
+
+  client.connect(async (err, db) => {
     if (err) throw err;
-    let favorietenCol = db.db("TechTeam").collection("favorieten");
-    favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $pull: { opgeslagen: gebNaam } })
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOneAndUpdate(
+        { email: req.session.userId.email },
+        { $pull: { favorieten: gebEmail } }
+      )
       .then(() => {
         db.close();
       });
@@ -465,6 +474,7 @@ async function handleAanmelden(req, res) {
           game3: req.body.game3,
           game4: req.body.game4,
           img: req.body.img,
+          favorieten: [],
         })
         .then(() => {
           db.close();
@@ -641,8 +651,7 @@ function renderDashboard(req, res) {
         .collection("gebruikers")
         .findOne({ naam: req.session.naam })
         .then(() => {
-          res.render("dashboard", { gebruikersLijst: req.session.userId });
-          console.log(req.session.userId);
+          res.render('dashboard', { gebruikersLijst: req.session.userId });
           db.close();
         });
     });

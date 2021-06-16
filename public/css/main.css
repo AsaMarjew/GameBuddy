@@ -55,6 +55,20 @@ body {
 main {
   text-align: center;
   position: relative;
+  height: 750px;
+  margin-top: 30px;
+  overflow: scroll;
+}
+
+main::-webkit-scrollbar,
+.fortnite section {
+  display: none;
+}
+
+main,
+.fortnite section {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .wit {
@@ -229,10 +243,15 @@ footer section a {
   background-color: var(--wit);
   width: 90%;
   border-radius: 5px;
-  margin-top: 70px;
+  margin-top: 30px;
   box-shadow: 5px 10px 18px #777;
   display: flex;
   text-align: center;
+}
+
+/* na de eerste .card komt een andere margin-top */
+.card ~ .card {
+  margin-top: 70px;
 }
 
 @media only screen and (max-width: 500px) {
@@ -405,18 +424,20 @@ footer section a {
 /* EINDE CARD */
 
 /* BEGIN ZOEKEN */
+#zoeken-wrapper {
+  position: absolute;
+}
+
 #zoeken-menu {
   color: var(--geel);
   font-size: 1.5em;
-  margin-top: -110px;
-  margin-right: 20px;
   cursor: pointer;
   height: 38px;
   width: 150px;
+  position: fixed;
+  margin-left: 430px;
+  margin-top: -75px;
   display: flex;
-  position: absolute;
-  top: 0;
-  right: 0;
 }
 
 #zoeken-menu span {

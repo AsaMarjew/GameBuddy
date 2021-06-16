@@ -7,7 +7,7 @@
 <h1>Favorieten</h1>
 
 <% if(gebruikersLijst.length > 0) { gebruikersLijst.forEach(gebruiker => { %>
-<div class="card" data-aos="fade-up">
+<div class="card">
   <div>
     <section>
       <span
@@ -30,8 +30,8 @@
       <form method="post" action="/favorieten">
         <input
           type="hidden"
-          value="<%- gebruiker.naam %>"
-          name="gebruikerNaam"
+          value="<%- gebruiker.email %>"
+          name="gebruikerEmail"
         />
         <input type="submit" class="favorietenButton" value="" />
         <i class="fas fa-heart-broken"></i>
