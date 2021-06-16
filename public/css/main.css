@@ -222,7 +222,7 @@ footer section a {
   margin-bottom: 75px !important;
 }
 
-#gameform input[type='submit'] {
+#gameform input[type="submit"] {
   margin: auto;
   display: flex;
   padding: 10px 90px;
@@ -585,12 +585,38 @@ footer section a {
   font-size: 0.8em;
 }
 
+.fortniteknop-dashboard {
+  margin-top: 45px;
+  left: 30px;
+}
+
+.fortniteknop-dashboard img {
+  width: 50px;
+  height: auto;
+}
+
+.fortnite section {
+  display: grid;
+  grid-template-columns: repeat(5000, calc(80% - 40px)) !important;
+  grid-template-rows: minmax(150px, 1fr);
+  overflow-y: scroll;
+}
+
 .fortnite ul {
   width: 60%;
   margin: 50px auto;
   padding: 10px 20px;
   list-style: none;
   border-radius: 5px;
+  position: relative;
+  height: 500px;
+}
+
+.fortnite ul li:last-child {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  left: 0px;
 }
 
 .fortnite ul:nth-child(even) {
@@ -598,7 +624,7 @@ footer section a {
 }
 
 .fortnite ul:nth-child(odd) {
-  background-color: var(--wit);
+  background-color: #efefef;
 }
 
 .fortnite ul li img {
@@ -607,19 +633,20 @@ footer section a {
   margin-bottom: 20px;
 }
 
-.fortnite ul li:nth-child(2) {
+.fortnite ul li:nth-child(3) {
   font-weight: 900;
   font-size: 1.2em;
   margin-bottom: 10px;
 }
 
-.fortnite ul li:nth-child(3) {
+.fortnite ul li:nth-child(4) {
   margin-bottom: 10px;
 }
 
-.fortnite ul li:nth-child(4) {
-  font-size: 0.7em;
+.fortnite ul li:nth-child(1) {
+  font-size: 1em;
   color: var(--grijs);
+  margin-bottom: 20px;
 }
 
 .fortnite h1 {
@@ -675,7 +702,7 @@ footer section a {
   color: var(--wit);
 }
 
-#inlog-form input[type='submit'] {
+#inlog-form input[type="submit"] {
   margin: auto;
   display: flex;
   padding: 10px 90px;
