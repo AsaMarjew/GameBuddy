@@ -141,7 +141,7 @@ app.get('/wijzigen', (req, res) => {
   if (!userId) {
     res.render('index');
   } else {
-    res.redirect('wijzigen');
+    res.render('wijzigen');
   }
 });
 
@@ -151,7 +151,7 @@ app.get('/verwijderen', (req, res) => {
   if (!userId) {
     res.render('index');
   } else {
-    res.redirect('verwijderen');
+    res.render('verwijderen');
   }
 });
 
@@ -161,7 +161,7 @@ app.get('/verwijderencheck', (req, res) => {
   if (!userId) {
     res.render('index');
   } else {
-    res.redirect('verwijderencheck');
+    res.render('verwijderencheck');
   }
 });
 
@@ -171,7 +171,7 @@ app.get('/verwijderenbericht', (req, res) => {
   if (!userId) {
     res.render('index');
   } else {
-    res.redirect('verwijderenbericht');
+    res.render('verwijderenbericht');
   }
 });
 
@@ -181,7 +181,7 @@ app.get('/verwijderennotfound', (req, res) => {
   if (!userId) {
     res.render('index');
   } else {
-    res.redirect('verwijderennotfound');
+    res.render('verwijderennotfound');
   }
 });
 
@@ -191,7 +191,7 @@ app.get('/wijzigenbericht', (req, res) => {
   if (!userId) {
     res.render('index');
   } else {
-    res.redirect('wijzigenbericht');
+    res.render('wijzigenbericht');
   }
 });
 
