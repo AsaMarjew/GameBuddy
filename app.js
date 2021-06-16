@@ -124,6 +124,11 @@ app.get('/aanmelden', (req, res) => {
   }
 });
 
+// Bericht account bestaat al route
+app.get('/accountbestaatal', (req, res) => {
+  res.render('accountbestaatal');
+});
+
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
 app.get('/zoeken', renderZoeken);
 
@@ -225,6 +230,12 @@ app.post('/logout', logoutPost);
 app.post('/zoeken', handleZoeken);
 app.post('/favorieten', handleFavorietenVerwijderen);
 app.post('/aanmelden', upload.single('image'), handleAanmelden);
+
+// Wijzigen post
+app.post('/wijzigen', uploadWijzig.single('wijzigimage'), handleUpdate);
+
+// Verwijderen post
+app.post('/verwijderen', handleVerwijderen);
 
 // -- routing functions --
 
@@ -456,7 +467,8 @@ function handleFavorietenVerwijderen(req, res) {
   }, 70);
 }
 
-// nieuwe gebruiker object aanmaken
+// De functie handleAanmelden zorgt ervoor dat het mogelijk is om een nieuwe gebruiker object aan te maken.
+// Vervolgens wordt het object opgeslagen in de database.
 async function handleAanmelden(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
@@ -464,65 +476,92 @@ async function handleAanmelden(req, res) {
   });
 
   client.connect((err, db) => {
+    const collection = db.db('TechTeam').collection('gebruikers');
     if (err) throw err;
 
-    // als javascript aanstaat gebruik de compressed image als img, als js uitstaat gebruik multer voor img upload
-    if (req.body.img) {
-      db.db('TechTeam')
-        .collection('gebruikers')
-        .insertOne({
-          naam: req.body.naam,
-          leeftijd: req.body.leeftijd,
-          email: req.body.email,
-          wachtwoord: req.body.wachtwoordaanmelden,
-          telefoon: req.body.telefoon,
-          console: req.body.console,
-          bio: req.body.bio,
-          game1: req.body.game1,
-          game2: req.body.game2,
-          game3: req.body.game3,
-          game4: req.body.game4,
-          img: req.body.img,
-        })
-        .then(() => {
-          db.close();
-          res.redirect('/zoeken');
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    } else {
-      db.db('TechTeam')
-        .collection('gebruikers')
-        .insertOne({
-          naam: req.body.naam,
-          leeftijd: req.body.leeftijd,
-          email: req.body.email,
-          wachtwoord: req.body.wachtwoordaanmelden,
-          telefoon: req.body.telefoon,
-          console: req.body.console,
-          bio: req.body.bio,
-          game1: req.body.game1,
-          game2: req.body.game2,
-          game3: req.body.game3,
-          game4: req.body.game4,
-          img: `uploads/${req.file.filename}`,
-        })
-        .then(() => {
-          db.close();
-          res.redirect('/zoeken');
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    }
+    const email = req.body.email;
+
+    collection
+      .find({ email: email }, { $exists: true })
+      .toArray(function (err, doc) {
+        // Check of er al een account is met het ingevulde mailadres
+        if (doc.length === 0) {
+          // als javascript aanstaat gebruik de compressed image als img, als js uitstaat gebruik multer voor img upload
+          if (req.body.img) {
+            db.db('TechTeam')
+              .collection('gebruikers')
+              .insertOne({
+                naam: req.body.naam,
+                leeftijd: req.body.leeftijd,
+                email: req.body.email,
+                wachtwoord: req.body.wachtwoordaanmelden,
+                telefoon: req.body.telefoon,
+                console: req.body.console,
+                bio: req.body.bio,
+                game1: req.body.game1,
+                game2: req.body.game2,
+                game3: req.body.game3,
+                game4: req.body.game4,
+                img: req.body.img,
+              })
+              .then(() => {
+                db.close();
+                res.redirect('/zoeken');
+              })
+              .catch(err => {
+                console.log(err);
+              });
+          } else {
+            db.db('TechTeam')
+              .collection('gebruikers')
+              .insertOne({
+                naam: req.body.naam,
+                leeftijd: req.body.leeftijd,
+                email: req.body.email,
+                wachtwoord: req.body.wachtwoordaanmelden,
+                telefoon: req.body.telefoon,
+                console: req.body.console,
+                bio: req.body.bio,
+                game1: req.body.game1,
+                game2: req.body.game2,
+                game3: req.body.game3,
+                game4: req.body.game4,
+                img: `uploads/${req.file.filename}`,
+              })
+              .then(() => {
+                db.close();
+                res.redirect('/zoeken');
+              })
+              .catch(err => {
+                console.log(err);
+              });
+          }
+          // mailOptions maakt de variabele aan met alle opties die nodig zijn voor het verzenden van een mail.
+          // Vervolgens wordt het door de funtie mailer verzonden.
+          const mailOptions = {
+            from: 'gamebuddyteamtech@gmail.com',
+            to: email,
+            subject: 'Game Buddy App - Welkom gamer!',
+            text: 'Leuk dat je een Game Buddy account hebt aangemaakt! Veel game plezier!',
+            attachments: [
+              {
+                filename: 'Logo.png',
+                path: __dirname + '/public/img/logo.ico',
+                cid: 'logo',
+              },
+            ],
+          };
+          mailer(mailOptions);
+        } else if (doc) {
+          res.redirect('/accountbestaatal');
+        }
+      });
   });
 }
 
-// Wijzigingen doorvoeren
-app.post('/wijzigen', uploadWijzig.single('wijzigimage'), wijzigen);
-
-async function wijzigen(req, res) {
+// De functie handleUpdate zorgt ervoor dat een account gewijzigd kan worden op basis van de ingevoerde email.
+// De document gegevens worden geheel gewijzigd in de database.
+async function handleUpdate(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -554,11 +593,13 @@ async function wijzigen(req, res) {
         }
       )
       .then(() => {
-        var mailOpties = {
+        // mailOptions maakt de variabele aan met alle opties die nodig zijn voor het verzenden van een mail.
+        // Vervolgens wordt het door de funtie mailer verzonden.
+        const mailOptions = {
           from: 'gamebuddyteamtech@gmail.com',
           to: email,
-          subject: 'GameBuddy App - Accountwijziging',
-          text: 'Je GameBuddy account is gewijzigd!',
+          subject: 'Game Buddy App - Accountwijziging',
+          text: 'Je Game Buddy account is gewijzigd!',
           attachments: [
             {
               filename: 'Logo.png',
@@ -568,7 +609,7 @@ async function wijzigen(req, res) {
           ],
         };
 
-        mailer(mailOpties);
+        mailer(mailOptions);
         db.close();
         res.redirect('/wijzigenbericht');
       })
@@ -579,11 +620,9 @@ async function wijzigen(req, res) {
   });
 }
 
-/*  Met de functie verwijderen worden documenten verwijderd uit de database.
-    Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
-app.post('/verwijderen', verwijderen);
-
-function verwijderen(req, res) {
+//  Met de functie verwijderen worden documenten verwijderd uit de database.
+//  Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.
+function handleVerwijderen(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -599,11 +638,13 @@ function verwijderen(req, res) {
         if (doc.length === 0) {
           res.redirect('/verwijderennotfound');
         } else if (doc) {
-          var mailOpties = {
+          // mailOptions maakt de variabele aan met alle opties die nodig zijn voor het verzenden van een mail.
+          // Vervolgens wordt het door de funtie mailer verzonden.
+          const mailOptions = {
             from: 'gamebuddyteamtech@gmail.com',
             to: email,
-            subject: 'GameBuddy App - Accountwijziging',
-            text: 'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
+            subject: 'Game Buddy App - Accountwijziging',
+            text: 'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
             attachments: [
               {
                 filename: 'Logo.png',
@@ -613,7 +654,7 @@ function verwijderen(req, res) {
             ],
           };
 
-          mailer(mailOpties);
+          mailer(mailOptions);
           collection.deleteMany({ email: email });
           res.redirect('/verwijderenbericht');
         }
