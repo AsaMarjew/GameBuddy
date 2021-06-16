@@ -235,7 +235,7 @@ app.post('/aanmelden', upload.single('image'), handleAanmelden);
 app.post('/wijzigen', uploadWijzig.single('wijzigimage'), handleUpdate);
 
 // Verwijderen post
-app.post('/verwijderen', handleVerwijderen);
+app.post('/verwijderen', handleRemove);
 
 // -- routing functions --
 
@@ -622,7 +622,7 @@ async function handleUpdate(req, res) {
 
 //  Met de functie verwijderen worden documenten verwijderd uit de database.
 //  Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.
-function handleVerwijderen(req, res) {
+function handleRemove(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
