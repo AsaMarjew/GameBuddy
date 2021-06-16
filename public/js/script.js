@@ -1,4 +1,3 @@
-
 //Knop variabels
 var filterKnop = document.querySelector('#filter');
 var filterForm = document.querySelector('#filteren');
