@@ -294,58 +294,42 @@ function renderFavorieten(req, res) {
 
 async function renderApi(req, res) {
   // --- fortnite API ---
+  //de api wordt gefetcht
   const fortniteApi = await fetch(
+    //in deze api zijn sommige items het zelfde daarom word data uit bepaalde items gehaald
     'https://fortnite-api.theapinetwork.com/items/list'
   )
+    //de data wordt gerenderd
     .then(res => res.json())
     .then(json => {
-      //GEGEVENS 0
-      const naam0 = json.data[3].item.name;
-      const desc0 = json.data[3].item.description;
-      const type0 = json.data[3].item.type;
-      const img0 = json.data[3].item.images.background;
-      var array0 = [naam0, desc0, type0];
+      //data in een variabel
+      const fortniteData = json.data;
 
-      //GEGEVENS 1
-      const naam1 = json.data[5].item.name;
-      const desc1 = json.data[5].item.description;
-      const type1 = json.data[5].item.type;
-      const img1 = json.data[5].item.images.background;
-      var array1 = [naam1, desc1, type1];
+      //session
+      let { userId } = req.session;
 
-      //GEGEVENS 2
-      const naam2 = json.data[6].item.name;
-      const desc2 = json.data[6].item.description;
-      const type2 = json.data[6].item.type;
-      const img2 = json.data[6].item.images.background;
-      var array2 = [naam2, desc2, type2];
+      //moment van login variabels
+      const nietIngelogdKnop = 'Login om te kopen';
+      const IngelogdKnop = 'Kopen';
+      const ingelogdUrl = 'https://fortnitetracker.com/shop';
+      const nietIngelogdUrl = '/inloggen';
 
-      //GEGEVENS 3
-      const naam3 = json.data[10].item.name;
-      const desc3 = json.data[10].item.description;
-      const type3 = json.data[10].item.type;
-      const img3 = json.data[10].item.images.background;
-      var array3 = [naam3, desc3, type3];
+      //als niet is ingelogd
+      if (!userId) {
+        res.render('fortnite', {
+          knop: nietIngelogdKnop,
+          knopUrl: nietIngelogdUrl,
+          fortniteData: fortniteData,
+        });
 
-      //GEGEVENS 4
-      const naam4 = json.data[12].item.name;
-      const desc4 = json.data[12].item.description;
-      const type4 = json.data[12].item.type;
-      const img4 = json.data[12].item.images.background;
-      var array4 = [naam4, desc4, type4];
-
-      res.render('fortnite', {
-        array0: array0,
-        img0: img0,
-        array1: array1,
-        img1: img1,
-        array2: array2,
-        img2: img2,
-        array3: array3,
-        img3: img3,
-        array4: array4,
-        img4: img4,
-      });
+        //als wel is ingelogd
+      } else {
+        res.render('fortnite', {
+          knop: IngelogdKnop,
+          knopUrl: ingelogdUrl,
+          fortniteData: fortniteData,
+        });
+      }
     });
 }
 
