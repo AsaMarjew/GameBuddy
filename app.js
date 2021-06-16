@@ -222,6 +222,8 @@ app.post('/inloggen', inloggenPost);
 // routing logout
 app.post('/logout', logoutPost);
 
+//routing redirect
+
 // --- END ROUTING LOGIN ---
 
 // --- post ---
@@ -240,13 +242,16 @@ app.post('/verwijderen', handleRemove);
 // -- routing functions --
 
 async function renderZoeken(req, res) {
-  try {
+    let { userId } = req.session;
+    if (!userId) {
+      res.redirect('inloggen');
+    } else {
+        try {
     const client = new MongoClient(uri, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     });
-
-    client.connect(async (err, db) => {
+      client.connect(async (err, db) => {
       if (err) throw err;
 
       const gebruikersCol = db.db('TechTeam').collection('gebruikers');
@@ -269,17 +274,23 @@ async function renderZoeken(req, res) {
     console.log(err);
   }
 }
+}
+
+
 
 function renderFavorieten(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
+  let { userId } = req.session;
+  if (!userId) {
+    res.redirect('inloggen');
+  } else {
+    client.connect((err, db) => {
+      if (err) throw err;
 
-  client.connect((err, db) => {
-    if (err) throw err;
-
-    // haal huidige gebruiker op
+  // haal huidige gebruiker op
     const gebruikersCol = db.db('TechTeam').collection('gebruikers');
     gebruikersCol
       .findOne({ email: req.session.userId.email })
@@ -301,6 +312,7 @@ function renderFavorieten(req, res) {
           });
       });
   });
+}
 }
 
 async function renderApi(req, res) {
