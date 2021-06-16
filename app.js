@@ -156,7 +156,7 @@ app.get('/verwijderencheck', (req, res) => {
   if (!userId) {
     res.render('index');
   } else {
-    res.redirect('verwijderencheck');
+    res.render('verwijderencheck');
   }
 });
 
