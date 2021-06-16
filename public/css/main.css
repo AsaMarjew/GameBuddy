@@ -163,38 +163,43 @@ footer section {
   flex-basis: 25%;
   text-align: center;
   position: relative;
+  color: var(--geel);
+  font-size: 2em;
 }
 
 footer section a {
-  font-size: 2em;
+  font-size: 1em;
   color: var(--geel);
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  text-decoration: none;
 }
 /* EINDE FOOTER */
 
 /* BEGIN REGISTREREN */
-
-#gameform div {
-  display: flex;
+#gameform {
+  width: 60%;
+  display: block;
 }
 
-#gameform div section {
-  display: grid;
+#gameform fieldset {
+  border: none;
+  width: 60%;
+}
+
+#gameform label {
+  display: block;
   width: 40%;
-}
-
-#gameform div section label {
   font-family: Ubuntu;
   color: var(--wit);
   font-weight: 100;
   margin-bottom: 2px;
 }
 
-#gameform div section input,
-#gameform div section select,
+#gameform input,
+#gameform select,
 #filteren select {
   width: 100%;
   padding: 8px 2px;
@@ -214,12 +219,27 @@ footer section a {
   margin-bottom: 100px;
 }
 
+#gameform div {
+  display: flex;
+  width: 100%;
+}
+
+#gameform div section {
+  display: grid;
+  width: 40%;
+}
+
 #filteren select {
   width: 50%;
 }
 
+#gameform fieldset:nth-child(3) select {
+  width: 100%;
+}
+
 #console {
   margin-bottom: 75px !important;
+  width: 100%;
 }
 
 #gameform input[type="submit"] {
@@ -234,6 +254,8 @@ footer section a {
   cursor: pointer;
   margin-top: 30px;
   margin-bottom: 80px;
+  width: 60%;
+  justify-content: center;
 }
 
 /* EINDE REGISTREREN */
@@ -676,23 +698,24 @@ footer section a {
 }
 
 /* BEGIN INLOGGEN */
-#inlog-form div {
-  display: flex;
-}
-
-#inlog-form div section {
-  display: grid;
+#inlog-form {
   width: 40%;
 }
 
-#inlog-form div section label {
+#inlog-form fieldset {
+  display: flex;
+}
+
+#inlog-form label {
+  display: grid;
+  width: 40%;
   font-family: Ubuntu;
   color: var(--wit);
   font-weight: 100;
   margin-bottom: 2px;
 }
 
-#inlog-form div section input {
+#inlog-form input {
   width: 100%;
   padding: 8px 2px;
   border: 0px;
@@ -735,4 +758,22 @@ footer section a {
 
 .dashboard {
   color: #fff;
+}
+
+.btn-aanmelden {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 10px 90px;
+  border-radius: 25px;
+  background-color: transparent;
+  color: var(--geel);
+  font-size: 1em;
+  letter-spacing: 2px;
+  cursor: pointer;
+  width: 130px;
+  text-decoration: none;
+}
+
+.footer section a:first-of-type {
+  display: none;
 }
