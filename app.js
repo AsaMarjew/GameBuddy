@@ -13,6 +13,7 @@ const port = process.env.PORT || 5000;
 
 // DB Setup
 const { MongoClient } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
@@ -120,7 +121,6 @@ app.get('/aanmelden', (req, res) => {
     res.render('aanmelden');
   } else {
     res.redirect('dashboard');
-    console.log(req.session);
   }
 });
 
@@ -250,15 +250,16 @@ async function renderZoeken(req, res) {
       if (err) throw err;
 
       const gebruikersCol = db.db('TechTeam').collection('gebruikers');
-      const favorietenCol = db.db('TechTeam').collection('favorieten');
 
-      // haal alle gebruikers op en opgeslagen gebruikers
+      // haal de huidige gebruiker op en een array van alle gebruikers
       let users = await gebruikersCol.find().toArray();
-      const favorites = await favorietenCol.findOne({ id: 0 });
+      const user = await gebruikersCol.findOne({
+        email: req.session.userId.email,
+      });
 
       // maak nieuwe array waar opgeslagen gebruikers niet instaan
       let undiscoveredUsers = users.filter(gebruiker => {
-        return !favorites.opgeslagen.includes(gebruiker.naam);
+        return !user.favorieten.includes(gebruiker.email);
       });
 
       res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
@@ -278,98 +279,81 @@ function renderFavorieten(req, res) {
   client.connect((err, db) => {
     if (err) throw err;
 
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    let gebruikersCol = db.db('TechTeam').collection('gebruikers');
-
-    favorietenCol.findOne({ id: 0 }).then(results => {
-      // haal IDs van opgeslagen gebruikers op => geef hele object terug
-      let users = [];
-      results.opgeslagen.forEach(gebNaam => {
-        users.push(gebruikersCol.findOne({ naam: gebNaam }));
-      });
-
-      // nadat alle gebruikers in de user array zitten => render pagina
-      Promise.all(users)
-        .then(data => {
-          res.render('favorieten', { gebruikersLijst: data });
-          db.close();
-        })
-        .catch(err => {
-          console.log(err);
+    // haal huidige gebruiker op
+    const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+    gebruikersCol
+      .findOne({ email: req.session.userId.email })
+      .then(gebruiker => {
+        let users = [];
+        // push alle favorieten gebruikers in een array
+        gebruiker.favorieten.forEach(email => {
+          users.push(gebruikersCol.findOne({ email: email }));
         });
-    });
+
+        // nadat alle gebruikers in de user array zitten => render pagina
+        Promise.all(users)
+          .then(data => {
+            res.render('favorieten', { gebruikersLijst: data });
+            db.close();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      });
   });
 }
 
 async function renderApi(req, res) {
   // --- fortnite API ---
+  //de api wordt gefetcht
   const fortniteApi = await fetch(
+    //in deze api zijn sommige items het zelfde daarom word data uit bepaalde items gehaald
     'https://fortnite-api.theapinetwork.com/items/list'
   )
+    //de data wordt gerenderd
     .then(res => res.json())
     .then(json => {
-      console.log('test');
+      //data in een variabel
+      const fortniteData = json.data;
 
-      //GEGEVENS 0
-      const naam0 = json.data[3].item.name;
-      const desc0 = json.data[3].item.description;
-      const type0 = json.data[3].item.type;
-      const img0 = json.data[3].item.images.background;
-      var array0 = [naam0, desc0, type0];
+      //session
+      let { userId } = req.session;
 
-      //GEGEVENS 1
-      const naam1 = json.data[5].item.name;
-      const desc1 = json.data[5].item.description;
-      const type1 = json.data[5].item.type;
-      const img1 = json.data[5].item.images.background;
-      var array1 = [naam1, desc1, type1];
+      //moment van login variabels
+      const nietIngelogdKnop = 'Login om te kopen';
+      const IngelogdKnop = 'Kopen';
+      const ingelogdUrl = 'https://fortnitetracker.com/shop';
+      const nietIngelogdUrl = '/inloggen';
 
-      //GEGEVENS 2
-      const naam2 = json.data[6].item.name;
-      const desc2 = json.data[6].item.description;
-      const type2 = json.data[6].item.type;
-      const img2 = json.data[6].item.images.background;
-      var array2 = [naam2, desc2, type2];
+      //als niet is ingelogd
+      if (!userId) {
+        res.render('fortnite', {
+          knop: nietIngelogdKnop,
+          knopUrl: nietIngelogdUrl,
+          fortniteData: fortniteData,
+        });
 
-      //GEGEVENS 3
-      const naam3 = json.data[10].item.name;
-      const desc3 = json.data[10].item.description;
-      const type3 = json.data[10].item.type;
-      const img3 = json.data[10].item.images.background;
-      var array3 = [naam3, desc3, type3];
-
-      //GEGEVENS 4
-      const naam4 = json.data[12].item.name;
-      const desc4 = json.data[12].item.description;
-      const type4 = json.data[12].item.type;
-      const img4 = json.data[12].item.images.background;
-      var array4 = [naam4, desc4, type4];
-
-      res.render('fortnite', {
-        array0: array0,
-        img0: img0,
-        array1: array1,
-        img1: img1,
-        array2: array2,
-        img2: img2,
-        array3: array3,
-        img3: img3,
-        array4: array4,
-        img4: img4,
-      });
+        //als wel is ingelogd
+      } else {
+        res.render('fortnite', {
+          knop: IngelogdKnop,
+          knopUrl: ingelogdUrl,
+          fortniteData: fortniteData,
+        });
+      }
     });
 }
 
 // -- handle post --
 
 function handleZoeken(req, res) {
-  //nieuwe variabel gebruikersnaam uit favorieten
-  let gebNaam = req.body.gebruikerNaam;
+  //nieuwe variabel gebruikerEmail uit favorieten
+  let gebEmail = req.body.gebruikerEmail;
 
-  //check of de favorieten gebruikersnaam bestaat
-  if (gebNaam) {
+  //check of de favorieten gebruikerEmail bestaat
+  if (gebEmail) {
     handleFavorieten(req, res);
-    //als het niet bestaat wordt filteren uitgevoerd
+    //als het niet bestaat wordt filteren uitgevoerd ipv favorieten
   } else {
     handleFilteren(req, res);
   }
@@ -427,14 +411,17 @@ function handleFavorieten(req, res) {
     useNewUrlParser: true,
   });
 
-  // voeg gebruikers ID aan favorieten toe
-  let gebNaam = req.body.gebruikerNaam;
-  console.log(gebNaam);
-  client.connect(function (err, db) {
+  // voeg gebruikers email aan favorieten van huidige gebruiker toe
+  let gebEmail = req.body.gebruikerEmail;
+
+  client.connect(async (err, db) => {
     if (err) throw err;
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebNaam } })
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOneAndUpdate(
+        { email: req.session.userId.email },
+        { $push: { favorieten: gebEmail } }
+      )
       .then(() => {
         db.close();
       });
@@ -451,13 +438,17 @@ function handleFavorietenVerwijderen(req, res) {
     useNewUrlParser: true,
   });
 
-  // verwijder gebruikers ID van favorieten
-  let gebNaam = req.body.gebruikerNaam;
-  client.connect(function (err, db) {
+  // verwijder gebruikers email uit favorieten van huidige gebruiker
+  let gebEmail = req.body.gebruikerEmail;
+
+  client.connect(async (err, db) => {
     if (err) throw err;
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $pull: { opgeslagen: gebNaam } })
+    db.db('TechTeam')
+      .collection('gebruikers')
+      .findOneAndUpdate(
+        { email: req.session.userId.email },
+        { $pull: { favorieten: gebEmail } }
+      )
       .then(() => {
         db.close();
       });
@@ -478,7 +469,6 @@ async function handleAanmelden(req, res) {
   client.connect((err, db) => {
     const collection = db.db('TechTeam').collection('gebruikers');
     if (err) throw err;
-
     const email = req.body.email;
 
     collection
@@ -503,10 +493,11 @@ async function handleAanmelden(req, res) {
                 game3: req.body.game3,
                 game4: req.body.game4,
                 img: req.body.img,
+                favorieten: [],
               })
               .then(() => {
                 db.close();
-                res.redirect('/zoeken');
+                res.redirect('/inloggen');
               })
               .catch(err => {
                 console.log(err);
@@ -527,10 +518,11 @@ async function handleAanmelden(req, res) {
                 game3: req.body.game3,
                 game4: req.body.game4,
                 img: `uploads/${req.file.filename}`,
+                favorieten: [],
               })
               .then(() => {
                 db.close();
-                res.redirect('/zoeken');
+                res.redirect('/inloggen');
               })
               .catch(err => {
                 console.log(err);
@@ -701,7 +693,6 @@ function renderDashboard(req, res) {
         .findOne({ naam: req.session.naam })
         .then(() => {
           res.render('dashboard', { gebruikersLijst: req.session.userId });
-          console.log(req.session.userId);
           db.close();
         });
     });

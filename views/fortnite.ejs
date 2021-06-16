@@ -13,48 +13,17 @@
     schaffen.
   </p>
 
-  <ul>
-    <li><img src="<%= img0 %>" /></li>
-    <% array0.forEach(function(array0){ %>
-    <li><%= array0 %></li>
-    <% }); %>
-    <li><a href="/login">Log in om te kopen</a></li>
-    <li><a href="https://fortnitetracker.com/shop">Kopen</a></li>
-  </ul>
+  <p>Scroll naar rechts om de bundels te zien</p>
 
-  <ul>
-    <li><img src="<%= img1 %>" /></li>
-    <% array1.forEach(function(array1){ %>
-    <li><%= array1 %></li>
-    <% }); %>
-    <li><a href="/login">Log in om te kopen</a></li>
-    <li><a href="https://fortnitetracker.com/shop">Kopen</a></li>
-  </ul>
-
-  <ul>
-    <li><img src="<%= img2 %>" /></li>
-    <% array2.forEach(function(array2){ %>
-    <li><%= array2 %></li>
-    <% }); %>
-    <li><a href="/login">Log in om te kopen</a></li>
-    <li><a href="https://fortnitetracker.com/shop">Kopen</a></li>
-  </ul>
-
-  <ul>
-    <li><img src="<%= img3 %>" /></li>
-    <% array3.forEach(function(array3){ %>
-    <li><%= array3 %></li>
-    <% }); %>
-    <li><a href="/login">Log in om te kopen</a></li>
-    <li><a href="https://fortnitetracker.com/shop">Kopen</a></li>
-  </ul>
-
-  <ul>
-    <li><img src="<%= img4 %>" /></li>
-    <% array4.forEach(function(array4){ %>
-    <li><%= array4 %></li>
-    <% }); %>
-    <li><a href="/login">Log in om te kopen</a></li>
-    <li><a href="https://fortnitetracker.com/shop">Kopen</a></li>
-  </ul>
+  <section>
+    <%for (var i = 0; i < 4; i++) {%>
+    <ul>
+      <li><%= fortniteData[i].item.type %></li>
+      <li><img src="<%= fortniteData[i].item.images.background %>" /></li>
+      <li><%= fortniteData[i].item.name %></li>
+      <li><%= fortniteData[i].item.description %></li>
+      <li><a href="<%= knopUrl %>"><%= knop %></a></li>
+    </ul>
+    <%}%>
+  </section>
 </div>
