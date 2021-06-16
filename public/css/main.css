@@ -628,23 +628,24 @@ footer section a {
 }
 
 /* BEGIN INLOGGEN */
-#inlog-form div {
-  display: flex;
-}
-
-#inlog-form div section {
-  display: grid;
+#inlog-form {
   width: 40%;
 }
 
-#inlog-form div section label {
+#inlog-form fieldset {
+  display: flex;
+}
+
+#inlog-form label {
+  display: grid;
+  width: 40%;
   font-family: Ubuntu;
   color: var(--wit);
   font-weight: 100;
   margin-bottom: 2px;
 }
 
-#inlog-form div section input {
+#inlog-form input {
   width: 100%;
   padding: 8px 2px;
   border: 0px;
@@ -690,12 +691,11 @@ footer section a {
 }
 
 .btn-aanmelden {
-  margin-top: 30px;
+  margin-top: 10px;
   display: inline-block;
   padding: 10px 90px;
   border-radius: 25px;
   background-color: transparent;
-  border: 2px solid var(--geel);
   color: var(--geel);
   font-size: 1em;
   letter-spacing: 2px;
