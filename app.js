@@ -13,6 +13,7 @@ const port = process.env.PORT || 5000;
 
 // DB Setup
 const { MongoClient } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
@@ -247,7 +248,7 @@ async function renderZoeken(req, res) {
 
       // maak nieuwe array waar opgeslagen gebruikers niet instaan
       let undiscoveredUsers = users.filter(gebruiker => {
-        return !favorites.opgeslagen.includes(gebruiker.naam);
+        return !favorites.opgeslagen.includes(gebruiker.email);
       });
 
       res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
@@ -273,8 +274,8 @@ function renderFavorieten(req, res) {
     favorietenCol.findOne({ id: 0 }).then(results => {
       // haal IDs van opgeslagen gebruikers op => geef hele object terug
       let users = [];
-      results.opgeslagen.forEach(gebNaam => {
-        users.push(gebruikersCol.findOne({ naam: gebNaam }));
+      results.opgeslagen.forEach(gebEmail => {
+        users.push(gebruikersCol.findOne({ email: gebEmail }));
       });
 
       // nadat alle gebruikers in de user array zitten => render pagina
@@ -353,10 +354,10 @@ async function renderApi(req, res) {
 
 function handleZoeken(req, res) {
   //nieuwe variabel gebruikersnaam uit favorieten
-  let gebNaam = req.body.gebruikerNaam;
+  let gebEmail = req.body.gebruikerEmail;
 
   //check of de favorieten gebruikersnaam bestaat
-  if (gebNaam) {
+  if (gebEmail) {
     handleFavorieten(req, res);
     //als het niet bestaat wordt filteren uitgevoerd
   } else {
@@ -416,14 +417,14 @@ function handleFavorieten(req, res) {
     useNewUrlParser: true,
   });
 
-  // voeg gebruikers ID aan favorieten toe
-  let gebNaam = req.body.gebruikerNaam;
-  console.log(gebNaam);
+  // voeg gebruikers email aan favorieten toe
+  let gebEmail = req.body.gebruikerEmail;
+
   client.connect(function (err, db) {
     if (err) throw err;
     let favorietenCol = db.db('TechTeam').collection('favorieten');
     favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebNaam } })
+      .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebEmail } })
       .then(() => {
         db.close();
       });
@@ -441,12 +442,12 @@ function handleFavorietenVerwijderen(req, res) {
   });
 
   // verwijder gebruikers ID van favorieten
-  let gebNaam = req.body.gebruikerNaam;
+  let gebEmail = req.body.gebruikerEmail;
   client.connect(function (err, db) {
     if (err) throw err;
     let favorietenCol = db.db('TechTeam').collection('favorieten');
     favorietenCol
-      .findOneAndUpdate({ id: 0 }, { $pull: { opgeslagen: gebNaam } })
+      .findOneAndUpdate({ id: 0 }, { $pull: { opgeslagen: gebEmail } })
       .then(() => {
         db.close();
       });
@@ -483,6 +484,7 @@ async function handleAanmelden(req, res) {
           game3: req.body.game3,
           game4: req.body.game4,
           img: req.body.img,
+          favorieten: [],
         })
         .then(() => {
           db.close();
