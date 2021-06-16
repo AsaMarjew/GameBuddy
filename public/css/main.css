@@ -60,11 +60,13 @@ main {
   overflow: scroll;
 }
 
-main::-webkit-scrollbar {
+main::-webkit-scrollbar,
+.fortnite section {
   display: none;
 }
 
-main {
+main,
+.fortnite section {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
