@@ -1,18 +1,18 @@
-require('dotenv').config();
-const express = require('express');
-const expressLayouts = require('express-ejs-layouts');
-const multer = require('multer');
-const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
-const fetch = require('node-fetch');
-const session = require('express-session');
-const sessionID = 'unniqueSessionID';
+require("dotenv").config();
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+const multer = require("multer");
+const bodyParser = require("body-parser");
+const nodemailer = require("nodemailer");
+const fetch = require("node-fetch");
+const session = require("express-session");
+const sessionID = "unniqueSessionID";
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // DB Setup
-const { MongoClient } = require('mongodb');
+const { MongoClient } = require("mongodb");
 const uri = process.env.DB_KEY;
 const client = new MongoClient(uri, {
   useUnifiedTopology: true,
@@ -24,7 +24,7 @@ const client = new MongoClient(uri, {
 //afbeeldingen worden opgeslagen in de public/uploads map
 const storage = multer.diskStorage({
   destination: function (request, file, callback) {
-    callback(null, './public/uploads');
+    callback(null, "./public/uploads");
   },
 
   //afbeeldingen krijgen naast de oorspronkelijke naam ook de huidige datum
@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
 //gewijzigde afbeeldingen
 const storageWijzig = multer.diskStorage({
   destination: function (request, file, callback) {
-    callback(null, './public/uploads');
+    callback(null, "./public/uploads");
   },
 
   filename: function (request, file, callback) {
@@ -61,15 +61,15 @@ const uploadWijzig = multer({
 });
 
 //de css, img en js map in de public map gebruiken
-app.use(express.static('public'));
-app.use('/css', express.static(__dirname + 'public.css'));
-app.use('/img', express.static(__dirname + 'public.img'));
-app.use('/js', express.static(__dirname + 'public.js'));
+app.use(express.static("public"));
+app.use("/css", express.static(__dirname + "public.css"));
+app.use("/img", express.static(__dirname + "public.img"));
+app.use("/js", express.static(__dirname + "public.js"));
 
 //express layout mobiel formaat en ejs gebruiken
 app.use(expressLayouts);
-app.set('layout', './layouts/mobiel-formaat');
-app.set('view engine', 'ejs');
+app.set("layout", "./layouts/mobiel-formaat");
+app.set("view engine", "ejs");
 
 //bodyparser en express.json voor http requests
 app.use(express.json());
@@ -78,10 +78,10 @@ app.use(bodyParser.json());
 
 // Nodemailer - Hier wordt de nodemailer opgezet en wordt er ingelogd op het adres waar emails van verzonden worden
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'gamebuddyteamtech@gmail.com',
-    pass: 'teamtech123',
+    user: "gamebuddyteamtech@gmail.com",
+    pass: "teamtech123",
   },
 });
 
@@ -104,127 +104,127 @@ app.use(
 // --- routing ---
 
 // render index
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('index');
+    res.render("index");
   } else {
-    res.redirect('dashboard');
+    res.redirect("dashboard");
   }
 });
 
 //aanmelden route
-app.get('/aanmelden', (req, res) => {
+app.get("/aanmelden", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('aanmelden');
+    res.render("aanmelden");
   } else {
-    res.redirect('dashboard');
+    res.redirect("dashboard");
     console.log(req.session);
   }
 });
 
 //zoeken route en gebruikers/oproepen in database vinden en mee sturen naar zoeken pagina
-app.get('/zoeken', renderZoeken);
+app.get("/zoeken", renderZoeken);
 
 // favorieten route
-app.get('/favorieten', renderFavorieten);
+app.get("/favorieten", renderFavorieten);
 
 //wijzigen route
-app.get('/wijzigen', (req, res) => {
+app.get("/wijzigen", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('index');
+    res.render("index");
   } else {
-    res.redirect('wijzigen');
+    res.redirect("wijzigen");
   }
 });
 
 //verwijderen route
-app.get('/verwijderen', (req, res) => {
+app.get("/verwijderen", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('index');
+    res.render("index");
   } else {
-    res.redirect('verwijderen');
+    res.redirect("verwijderen");
   }
 });
 
 // Weergave van de verwijdercheck pagina
-app.get('/verwijderencheck', (req, res) => {
+app.get("/verwijderencheck", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('index');
+    res.render("index");
   } else {
-    res.redirect('verwijderencheck');
+    res.redirect("verwijderencheck");
   }
 });
 
 // Weergave van de verwijderbericht pagina
-app.get('/verwijderenbericht', (req, res) => {
+app.get("/verwijderenbericht", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('index');
+    res.render("index");
   } else {
-    res.redirect('verwijderenbericht');
+    res.redirect("verwijderenbericht");
   }
 });
 
 // Weergave van de verwijdernotfound pagina
-app.get('/verwijderennotfound', (req, res) => {
+app.get("/verwijderennotfound", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('index');
+    res.render("index");
   } else {
-    res.redirect('verwijderennotfound');
+    res.redirect("verwijderennotfound");
   }
 });
 
 // Weergave van de wijzigenbericht pagina
-app.get('/wijzigenbericht', (req, res) => {
+app.get("/wijzigenbericht", (req, res) => {
   let { userId } = req.session;
   if (!userId) {
-    res.render('index');
+    res.render("index");
   } else {
-    res.redirect('wijzigenbericht');
+    res.redirect("wijzigenbericht");
   }
 });
 
 //tutorial route
-app.get('/hoe-werkt-het', (req, res) => {
-  res.render('hoewerkthet');
+app.get("/hoe-werkt-het", (req, res) => {
+  res.render("hoewerkthet");
 });
 
 //error route
-app.get('/error', (req, res) => {
-  res.render('error');
+app.get("/error", (req, res) => {
+  res.render("error");
 });
 
 // api get
-app.get('/fortnite', renderApi);
+app.get("/fortnite", renderApi);
 
 // --- ROUTING LOGIN ---
 
 //render login
-app.get('/inloggen', renderInloggen);
+app.get("/inloggen", renderInloggen);
 
 //render dashboard
-app.get('/dashboard', renderDashboard);
+app.get("/dashboard", renderDashboard);
 
 //routing login
-app.post('/inloggen', inloggenPost);
+app.post("/inloggen", inloggenPost);
 
 // routing logout
-app.post('/logout', logoutPost);
+app.post("/logout", logoutPost);
 
 // --- END ROUTING LOGIN ---
 
 // --- post ---
 
 // filter post
-app.post('/zoeken', handleZoeken);
-app.post('/favorieten', handleFavorietenVerwijderen);
-app.post('/aanmelden', upload.single('image'), handleAanmelden);
+app.post("/zoeken", handleZoeken);
+app.post("/favorieten", handleFavorietenVerwijderen);
+app.post("/aanmelden", upload.single("image"), handleAanmelden);
 
 // -- routing functions --
 
@@ -238,19 +238,19 @@ async function renderZoeken(req, res) {
     client.connect(async (err, db) => {
       if (err) throw err;
 
-      const gebruikersCol = db.db('TechTeam').collection('gebruikers');
-      const favorietenCol = db.db('TechTeam').collection('favorieten');
+      const gebruikersCol = db.db("TechTeam").collection("gebruikers");
+      const favorietenCol = db.db("TechTeam").collection("favorieten");
 
       // haal alle gebruikers op en opgeslagen gebruikers
       let users = await gebruikersCol.find().toArray();
       const favorites = await favorietenCol.findOne({ id: 0 });
 
       // maak nieuwe array waar opgeslagen gebruikers niet instaan
-      let undiscoveredUsers = users.filter(gebruiker => {
+      let undiscoveredUsers = users.filter((gebruiker) => {
         return !favorites.opgeslagen.includes(gebruiker.naam);
       });
 
-      res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
+      res.render("zoeken", { gebruikersLijst: undiscoveredUsers });
       db.close();
     });
   } catch (err) {
@@ -267,23 +267,23 @@ function renderFavorieten(req, res) {
   client.connect((err, db) => {
     if (err) throw err;
 
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    let gebruikersCol = db.db('TechTeam').collection('gebruikers');
+    let favorietenCol = db.db("TechTeam").collection("favorieten");
+    let gebruikersCol = db.db("TechTeam").collection("gebruikers");
 
-    favorietenCol.findOne({ id: 0 }).then(results => {
+    favorietenCol.findOne({ id: 0 }).then((results) => {
       // haal IDs van opgeslagen gebruikers op => geef hele object terug
       let users = [];
-      results.opgeslagen.forEach(gebNaam => {
+      results.opgeslagen.forEach((gebNaam) => {
         users.push(gebruikersCol.findOne({ naam: gebNaam }));
       });
 
       // nadat alle gebruikers in de user array zitten => render pagina
       Promise.all(users)
-        .then(data => {
-          res.render('favorieten', { gebruikersLijst: data });
+        .then((data) => {
+          res.render("favorieten", { gebruikersLijst: data });
           db.close();
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     });
@@ -292,60 +292,42 @@ function renderFavorieten(req, res) {
 
 async function renderApi(req, res) {
   // --- fortnite API ---
+  //de api wordt gefetcht
   const fortniteApi = await fetch(
-    'https://fortnite-api.theapinetwork.com/items/list'
+    //in deze api zijn sommige items het zelfde daarom word data uit bepaalde items gehaald
+    "https://fortnite-api.theapinetwork.com/items/list"
   )
-    .then(res => res.json())
-    .then(json => {
-      console.log('test');
+    //de data wordt gerenderd
+    .then((res) => res.json())
+    .then((json) => {
+      //data in een variabel
+      const fortniteData = json.data;
 
-      //GEGEVENS 0
-      const naam0 = json.data[3].item.name;
-      const desc0 = json.data[3].item.description;
-      const type0 = json.data[3].item.type;
-      const img0 = json.data[3].item.images.background;
-      var array0 = [naam0, desc0, type0];
+      //session
+      let { userId } = req.session;
 
-      //GEGEVENS 1
-      const naam1 = json.data[5].item.name;
-      const desc1 = json.data[5].item.description;
-      const type1 = json.data[5].item.type;
-      const img1 = json.data[5].item.images.background;
-      var array1 = [naam1, desc1, type1];
+      //moment van login variabels
+      const nietIngelogdKnop = "Login om te kopen";
+      const IngelogdKnop = "Kopen";
+      const ingelogdUrl = "https://fortnitetracker.com/shop";
+      const nietIngelogdUrl = "/inloggen";
 
-      //GEGEVENS 2
-      const naam2 = json.data[6].item.name;
-      const desc2 = json.data[6].item.description;
-      const type2 = json.data[6].item.type;
-      const img2 = json.data[6].item.images.background;
-      var array2 = [naam2, desc2, type2];
+      //als niet is ingelogd
+      if (!userId) {
+        res.render("fortnite", {
+          knop: nietIngelogdKnop,
+          knopUrl: nietIngelogdUrl,
+          fortniteData: fortniteData,
+        });
 
-      //GEGEVENS 3
-      const naam3 = json.data[10].item.name;
-      const desc3 = json.data[10].item.description;
-      const type3 = json.data[10].item.type;
-      const img3 = json.data[10].item.images.background;
-      var array3 = [naam3, desc3, type3];
-
-      //GEGEVENS 4
-      const naam4 = json.data[12].item.name;
-      const desc4 = json.data[12].item.description;
-      const type4 = json.data[12].item.type;
-      const img4 = json.data[12].item.images.background;
-      var array4 = [naam4, desc4, type4];
-
-      res.render('fortnite', {
-        array0: array0,
-        img0: img0,
-        array1: array1,
-        img1: img1,
-        array2: array2,
-        img2: img2,
-        array3: array3,
-        img3: img3,
-        array4: array4,
-        img4: img4,
-      });
+        //als wel is ingelogd
+      } else {
+        res.render("fortnite", {
+          knop: IngelogdKnop,
+          knopUrl: ingelogdUrl,
+          fortniteData: fortniteData,
+        });
+      }
     });
 }
 
@@ -382,7 +364,7 @@ function handleFilteren(req, res) {
     let query = {};
 
     //als gebruiker op de optie alle klikt wordt er een lege query verstuurd
-    if (consoleFilter === 'Alle') {
+    if (consoleFilter === "Alle") {
       query = {};
       //als de gebruiker een console kiest wordt de console uit de form in de query gezet
     } else {
@@ -392,15 +374,15 @@ function handleFilteren(req, res) {
     }
 
     //verbinding met db en de collectie
-    db.db('TechTeam')
-      .collection('gebruikers')
+    db.db("TechTeam")
+      .collection("gebruikers")
       //in de db wordt met de query gezocht
       .find(query)
       //resultaten worden in een array gezet
       .toArray(function (err, gebruikers) {
         if (err) throw err;
         //de gegevens worden gerenderd
-        res.render('zoeken', {
+        res.render("zoeken", {
           gebruikersLijst: gebruikers,
           consoleFilter,
         });
@@ -421,7 +403,7 @@ function handleFavorieten(req, res) {
   console.log(gebNaam);
   client.connect(function (err, db) {
     if (err) throw err;
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
+    let favorietenCol = db.db("TechTeam").collection("favorieten");
     favorietenCol
       .findOneAndUpdate({ id: 0 }, { $push: { opgeslagen: gebNaam } })
       .then(() => {
@@ -429,7 +411,7 @@ function handleFavorieten(req, res) {
       });
   });
   setTimeout(() => {
-    res.redirect('back');
+    res.redirect("back");
   }, 70);
 }
 
@@ -444,7 +426,7 @@ function handleFavorietenVerwijderen(req, res) {
   let gebNaam = req.body.gebruikerNaam;
   client.connect(function (err, db) {
     if (err) throw err;
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
+    let favorietenCol = db.db("TechTeam").collection("favorieten");
     favorietenCol
       .findOneAndUpdate({ id: 0 }, { $pull: { opgeslagen: gebNaam } })
       .then(() => {
@@ -452,7 +434,7 @@ function handleFavorietenVerwijderen(req, res) {
       });
   });
   setTimeout(() => {
-    res.redirect('back');
+    res.redirect("back");
   }, 70);
 }
 
@@ -468,8 +450,8 @@ async function handleAanmelden(req, res) {
 
     // als javascript aanstaat gebruik de compressed image als img, als js uitstaat gebruik multer voor img upload
     if (req.body.img) {
-      db.db('TechTeam')
-        .collection('gebruikers')
+      db.db("TechTeam")
+        .collection("gebruikers")
         .insertOne({
           naam: req.body.naam,
           leeftijd: req.body.leeftijd,
@@ -486,14 +468,14 @@ async function handleAanmelden(req, res) {
         })
         .then(() => {
           db.close();
-          res.redirect('/zoeken');
+          res.redirect("/zoeken");
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     } else {
-      db.db('TechTeam')
-        .collection('gebruikers')
+      db.db("TechTeam")
+        .collection("gebruikers")
         .insertOne({
           naam: req.body.naam,
           leeftijd: req.body.leeftijd,
@@ -510,9 +492,9 @@ async function handleAanmelden(req, res) {
         })
         .then(() => {
           db.close();
-          res.redirect('/zoeken');
+          res.redirect("/zoeken");
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     }
@@ -520,7 +502,7 @@ async function handleAanmelden(req, res) {
 }
 
 // Wijzigingen doorvoeren
-app.post('/wijzigen', uploadWijzig.single('wijzigimage'), wijzigen);
+app.post("/wijzigen", uploadWijzig.single("wijzigimage"), wijzigen);
 
 async function wijzigen(req, res) {
   const client = new MongoClient(uri, {
@@ -532,8 +514,8 @@ async function wijzigen(req, res) {
 
   client.connect((err, db) => {
     if (err) throw err;
-    db.db('TechTeam')
-      .collection('gebruikers')
+    db.db("TechTeam")
+      .collection("gebruikers")
       .findOneAndUpdate(
         { email: email },
         {
@@ -555,33 +537,33 @@ async function wijzigen(req, res) {
       )
       .then(() => {
         var mailOpties = {
-          from: 'gamebuddyteamtech@gmail.com',
+          from: "gamebuddyteamtech@gmail.com",
           to: email,
-          subject: 'GameBuddy App - Accountwijziging',
-          text: 'Je GameBuddy account is gewijzigd!',
+          subject: "GameBuddy App - Accountwijziging",
+          text: "Je GameBuddy account is gewijzigd!",
           attachments: [
             {
-              filename: 'Logo.png',
-              path: __dirname + '/public/img/logo.ico',
-              cid: 'logo',
+              filename: "Logo.png",
+              path: __dirname + "/public/img/logo.ico",
+              cid: "logo",
             },
           ],
         };
 
         mailer(mailOpties);
         db.close();
-        res.redirect('/wijzigenbericht');
+        res.redirect("/wijzigenbericht");
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
-        res.redirect('/error');
+        res.redirect("/error");
       });
   });
 }
 
 /*  Met de functie verwijderen worden documenten verwijderd uit de database.
     Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.*/
-app.post('/verwijderen', verwijderen);
+app.post("/verwijderen", verwijderen);
 
 function verwijderen(req, res) {
   const client = new MongoClient(uri, {
@@ -592,30 +574,30 @@ function verwijderen(req, res) {
   const email = req.body.verwijderemail;
 
   client.connect((err, db) => {
-    const collection = db.db('TechTeam').collection('gebruikers');
+    const collection = db.db("TechTeam").collection("gebruikers");
     collection
       .find({ email: email }, { $exists: true })
       .toArray(function (err, doc) {
         if (doc.length === 0) {
-          res.redirect('/verwijderennotfound');
+          res.redirect("/verwijderennotfound");
         } else if (doc) {
           var mailOpties = {
-            from: 'gamebuddyteamtech@gmail.com',
+            from: "gamebuddyteamtech@gmail.com",
             to: email,
-            subject: 'GameBuddy App - Accountwijziging',
-            text: 'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
+            subject: "GameBuddy App - Accountwijziging",
+            text: "Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->",
             attachments: [
               {
-                filename: 'Logo.png',
-                path: __dirname + '/public/img/logo.ico',
-                cid: 'logo',
+                filename: "Logo.png",
+                path: __dirname + "/public/img/logo.ico",
+                cid: "logo",
               },
             ],
           };
 
           mailer(mailOpties);
           collection.deleteMany({ email: email });
-          res.redirect('/verwijderenbericht');
+          res.redirect("/verwijderenbericht");
         }
       });
   });
@@ -627,18 +609,18 @@ function mailer(Optie) {
     if (error) {
       console.log(error);
     } else {
-      console.log('Email sent: ' + info.response);
+      console.log("Email sent: " + info.response);
     }
   });
 }
 
 //function logout post
 function logoutPost(req, res) {
-  req.session.destroy(err => {
+  req.session.destroy((err) => {
     if (err) {
-      return res.redirect('dashboard');
+      return res.redirect("dashboard");
     } else {
-      res.redirect('/');
+      res.redirect("/");
     }
   });
 }
@@ -650,16 +632,16 @@ function renderDashboard(req, res) {
   });
   let { userId } = req.session;
   if (!userId) {
-    res.redirect('inloggen');
+    res.redirect("inloggen");
   } else {
     client.connect((err, db) => {
       if (err) throw err;
 
-      db.db('TechTeam')
-        .collection('gebruikers')
+      db.db("TechTeam")
+        .collection("gebruikers")
         .findOne({ naam: req.session.naam })
         .then(() => {
-          res.render('dashboard', { gebruikersLijst: req.session.userId });
+          res.render("dashboard", { gebruikersLijst: req.session.userId });
           console.log(req.session.userId);
           db.close();
         });
@@ -671,9 +653,9 @@ function renderDashboard(req, res) {
 function renderInloggen(req, res) {
   let { userId } = req.session;
   if (!userId) {
-    res.render('inloggen');
+    res.render("inloggen");
   } else {
-    res.redirect('dashboard');
+    res.redirect("dashboard");
   }
 }
 //function post inloggen with session
@@ -683,7 +665,7 @@ function inloggenPost(req, res) {
     useNewUrlParser: true,
   });
   client.connect((err, db) => {
-    let gebruikers = db.db('TechTeam').collection('gebruikers');
+    let gebruikers = db.db("TechTeam").collection("gebruikers");
     const email = req.body.emailInloggen;
     const password = req.body.wachtwoordInloggen;
 
@@ -698,7 +680,7 @@ function inloggenPost(req, res) {
             next(err);
           } else {
             req.session.userId = data;
-            res.redirect('/dashboard');
+            res.redirect("/dashboard");
           }
         }
       );
@@ -708,7 +690,7 @@ function inloggenPost(req, res) {
 
 //404
 app.use(function (req, res) {
-  res.status(404).render('404');
+  res.status(404).render("404");
 });
 
 //app geeft de port terug
