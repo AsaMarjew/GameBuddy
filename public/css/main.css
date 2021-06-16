@@ -162,25 +162,27 @@ footer section a {
 /* EINDE FOOTER */
 
 /* BEGIN REGISTREREN */
-
-#gameform div {
-  display: flex;
+#gameform {
+  width: 60%;
+  display: block;
 }
 
-#gameform div section {
-  display: grid;
+#gameform fieldset {
+  border: none;
+  width: 60%;
+}
+
+#gameform label {
+  display: block;
   width: 40%;
-}
-
-#gameform div section label {
   font-family: Ubuntu;
   color: var(--wit);
   font-weight: 100;
   margin-bottom: 2px;
 }
 
-#gameform div section input,
-#gameform div section select,
+#gameform input,
+#gameform select,
 #filteren select {
   width: 100%;
   padding: 8px 2px;
@@ -200,12 +202,27 @@ footer section a {
   margin-bottom: 100px;
 }
 
+#gameform div {
+  display: flex;
+  width: 100%;
+}
+
+#gameform div section {
+  display: grid;
+  width: 40%;
+}
+
 #filteren select {
   width: 50%;
 }
 
+#gameform fieldset:nth-child(3) select {
+  width: 100%;
+}
+
 #console {
   margin-bottom: 75px !important;
+  width: 100%;
 }
 
 #gameform input[type='submit'] {
@@ -220,6 +237,8 @@ footer section a {
   cursor: pointer;
   margin-top: 30px;
   margin-bottom: 80px;
+  width: 60%;
+  justify-content: center;
 }
 
 /* EINDE REGISTREREN */
