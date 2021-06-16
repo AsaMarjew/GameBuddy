@@ -149,15 +149,18 @@ footer section {
   flex-basis: 25%;
   text-align: center;
   position: relative;
+  color: var(--geel);
+  font-size: 2em;
 }
 
 footer section a {
-  font-size: 2em;
+  font-size: 1em;
   color: var(--geel);
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  text-decoration: none;
 }
 /* EINDE FOOTER */
 
@@ -720,4 +723,8 @@ footer section a {
   letter-spacing: 2px;
   cursor: pointer;
   width: 130px;
+}
+
+.footer section a:first-of-type {
+  display: none;
 }
