@@ -85,6 +85,7 @@ SESSION_SECRET= <jouw geheime token>
 * Dotenv
 * Bodyparser
 * Multer
+* Nodemailer
 * Node Fetch
 * AOS.JS
 * Font-Awesome
