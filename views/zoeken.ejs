@@ -1,5 +1,6 @@
 <div id="zoeken-menu">
   <span id="filter"><i class="fas fa-filter"></i></span>
+
 </div>
 
 <%gebruikersLijst.forEach(gebruiker => {%>
@@ -28,8 +29,8 @@
       <form method="post" action="/zoeken">
         <input
           type="hidden"
-          value="<%- gebruiker.naam %>"
-          name="gebruikerNaam"
+          value="<%- gebruiker.email %>"
+          name="gebruikerEmail"
         />
         <input type="submit" class="favorietenButton" value="" />
         <i class="fas fa-heart"></i>

@@ -39,6 +39,11 @@ Lees de <a href="https://github.com/AsaMarjew/GameBuddy/wiki">wiki</a> voor meer
 
 <br/>
 
+## Schermen
+Klik <a href="https://github.com/AsaMarjew/GameBuddy/wiki/wireflow">hier</a> om de wireflow te bekijken.
+
+<br/>
+
 ## Installeren
 1. Clone de repository<br/>
 ```
