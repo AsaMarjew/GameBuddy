@@ -1,10 +1,3 @@
-//AOS
-AOS.init({
-  offset: 200,
-  duration: 500,
-  easing: 'ease-in-quad',
-  delay: 100,
-});
 
 //Knop variabels
 var filterKnop = document.querySelector('#filter');

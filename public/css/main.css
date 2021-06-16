@@ -723,6 +723,7 @@ footer section a {
   letter-spacing: 2px;
   cursor: pointer;
   width: 130px;
+  text-decoration: none;
 }
 
 .footer section a:first-of-type {
