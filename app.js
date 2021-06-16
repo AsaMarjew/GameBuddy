@@ -242,15 +242,15 @@ app.post('/verwijderen', handleRemove);
 // -- routing functions --
 
 async function renderZoeken(req, res) {
-  try {
-    const client = new MongoClient(uri, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    });
     let { userId } = req.session;
     if (!userId) {
       res.redirect('inloggen');
     } else {
+        try {
+    const client = new MongoClient(uri, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    });
       client.connect(async (err, db) => {
       if (err) throw err;
 
@@ -274,6 +274,8 @@ async function renderZoeken(req, res) {
     console.log(err);
   }
 }
+}
+
 
 
 function renderFavorieten(req, res) {
@@ -310,6 +312,7 @@ function renderFavorieten(req, res) {
           });
       });
   });
+}
 }
 
 async function renderApi(req, res) {
