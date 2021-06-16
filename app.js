@@ -494,7 +494,7 @@ async function handleAanmelden(req, res) {
         })
         .then(() => {
           db.close();
-          res.redirect('/zoeken');
+          res.redirect('/inloggen');
         })
         .catch(err => {
           console.log(err);
@@ -518,7 +518,7 @@ async function handleAanmelden(req, res) {
         })
         .then(() => {
           db.close();
-          res.redirect('/zoeken');
+          res.redirect('/inloggen');
         })
         .catch(err => {
           console.log(err);
