@@ -242,7 +242,7 @@ footer section a {
   width: 100%;
 }
 
-#gameform input[type="submit"] {
+#gameform input[type='submit'] {
   margin: auto;
   display: flex;
   padding: 10px 90px;
@@ -382,6 +382,8 @@ footer section a {
   background-color: #232323;
   border: none;
   border-radius: 5px;
+  color: var(--geel);
+  font-size: 2em;
 }
 
 .card .favorietenButton + svg {
@@ -725,7 +727,7 @@ footer section a {
   color: var(--wit);
 }
 
-#inlog-form input[type="submit"] {
+#inlog-form input[type='submit'] {
   margin: auto;
   display: flex;
   padding: 10px 90px;
