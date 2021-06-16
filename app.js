@@ -217,6 +217,8 @@ app.post('/inloggen', inloggenPost);
 // routing logout
 app.post('/logout', logoutPost);
 
+//routing redirect
+
 // --- END ROUTING LOGIN ---
 
 // --- post ---
@@ -234,25 +236,29 @@ async function renderZoeken(req, res) {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     });
+    let { userId } = req.session;
+    if (!userId) {
+      res.redirect('inloggen');
+    } else {
+      client.connect(async (err, db) => {
+        if (err) throw err;
 
-    client.connect(async (err, db) => {
-      if (err) throw err;
+        const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+        const favorietenCol = db.db('TechTeam').collection('favorieten');
 
-      const gebruikersCol = db.db('TechTeam').collection('gebruikers');
-      const favorietenCol = db.db('TechTeam').collection('favorieten');
+        // haal alle gebruikers op en opgeslagen gebruikers
+        let users = await gebruikersCol.find().toArray();
+        const favorites = await favorietenCol.findOne({ id: 0 });
 
-      // haal alle gebruikers op en opgeslagen gebruikers
-      let users = await gebruikersCol.find().toArray();
-      const favorites = await favorietenCol.findOne({ id: 0 });
+        // maak nieuwe array waar opgeslagen gebruikers niet instaan
+        let undiscoveredUsers = users.filter(gebruiker => {
+          return !favorites.opgeslagen.includes(gebruiker.naam);
+        });
 
-      // maak nieuwe array waar opgeslagen gebruikers niet instaan
-      let undiscoveredUsers = users.filter(gebruiker => {
-        return !favorites.opgeslagen.includes(gebruiker.naam);
+        res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
+        db.close();
       });
-
-      res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
-      db.close();
-    });
+    }
   } catch (err) {
     console.log(err);
   }
@@ -263,31 +269,35 @@ function renderFavorieten(req, res) {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
+  let { userId } = req.session;
+  if (!userId) {
+    res.redirect('inloggen');
+  } else {
+    client.connect((err, db) => {
+      if (err) throw err;
 
-  client.connect((err, db) => {
-    if (err) throw err;
+      let favorietenCol = db.db('TechTeam').collection('favorieten');
+      let gebruikersCol = db.db('TechTeam').collection('gebruikers');
 
-    let favorietenCol = db.db('TechTeam').collection('favorieten');
-    let gebruikersCol = db.db('TechTeam').collection('gebruikers');
-
-    favorietenCol.findOne({ id: 0 }).then(results => {
-      // haal IDs van opgeslagen gebruikers op => geef hele object terug
-      let users = [];
-      results.opgeslagen.forEach(gebNaam => {
-        users.push(gebruikersCol.findOne({ naam: gebNaam }));
-      });
-
-      // nadat alle gebruikers in de user array zitten => render pagina
-      Promise.all(users)
-        .then(data => {
-          res.render('favorieten', { gebruikersLijst: data });
-          db.close();
-        })
-        .catch(err => {
-          console.log(err);
+      favorietenCol.findOne({ id: 0 }).then(results => {
+        // haal IDs van opgeslagen gebruikers op => geef hele object terug
+        let users = [];
+        results.opgeslagen.forEach(gebNaam => {
+          users.push(gebruikersCol.findOne({ naam: gebNaam }));
         });
+
+        // nadat alle gebruikers in de user array zitten => render pagina
+        Promise.all(users)
+          .then(data => {
+            res.render('favorieten', { gebruikersLijst: data });
+            db.close();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      });
     });
-  });
+  }
 }
 
 async function renderApi(req, res) {
@@ -603,7 +613,8 @@ function verwijderen(req, res) {
             from: 'gamebuddyteamtech@gmail.com',
             to: email,
             subject: 'GameBuddy App - Accountwijziging',
-            text: 'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
+            text:
+              'Je GameBuddy account is verwijderd! Maak hier opnieuw een account aan ->',
             attachments: [
               {
                 filename: 'Logo.png',
@@ -660,7 +671,7 @@ function renderDashboard(req, res) {
         .findOne({ naam: req.session.naam })
         .then(() => {
           res.render('dashboard', { gebruikersLijst: req.session.userId });
-          console.log(req.session.userId);
+
           db.close();
         });
     });

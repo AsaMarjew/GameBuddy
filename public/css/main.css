@@ -525,7 +525,6 @@ footer section a {
 }
 /* EINDE HOEWERKTHET */
 
-
 /* BEGIN VERWIJDERENBERICHT PAGINA */
 .verButton {
   margin: auto;
@@ -688,4 +687,18 @@ footer section a {
 
 .dashboard {
   color: #fff;
+}
+
+.btn-aanmelden {
+  margin-top: 30px;
+  display: inline-block;
+  padding: 10px 90px;
+  border-radius: 25px;
+  background-color: transparent;
+  border: 2px solid var(--geel);
+  color: var(--geel);
+  font-size: 1em;
+  letter-spacing: 2px;
+  cursor: pointer;
+  width: 130px;
 }
