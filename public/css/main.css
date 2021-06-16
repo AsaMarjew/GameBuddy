@@ -242,7 +242,7 @@ footer section a {
   width: 100%;
 }
 
-#gameform input[type="submit"] {
+#gameform input[type='submit'] {
   margin: auto;
   display: flex;
   padding: 10px 90px;
@@ -457,7 +457,7 @@ footer section a {
   height: 38px;
   width: 150px;
   position: fixed;
-  margin-left: 430px;
+  margin-left: 410px;
   margin-top: -75px;
   display: flex;
 }
@@ -465,6 +465,7 @@ footer section a {
 #zoeken-menu span {
   position: relative;
   flex-basis: 33%;
+  margin-left: 10px;
 }
 /* EINDE ZOEKEN */
 
@@ -608,13 +609,22 @@ footer section a {
 }
 
 .fortniteknop-dashboard {
-  margin-top: 45px;
-  left: 30px;
+  margin-top: 140px;
+  margin-right: 40px;
+  left: 20px;
+}
+
+.fortniteknop-dashboard a {
+  text-decoration: none;
+  font-size: 0.8em;
 }
 
 .fortniteknop-dashboard img {
-  width: 50px;
-  height: auto;
+  width: 80px;
+}
+.fortniteknop-dashboard p {
+  color: #fff;
+  font-size: 0.8em;
 }
 
 .fortnite section {
@@ -725,7 +735,7 @@ footer section a {
   color: var(--wit);
 }
 
-#inlog-form input[type="submit"] {
+#inlog-form input[type='submit'] {
   margin: auto;
   display: flex;
   padding: 10px 90px;
