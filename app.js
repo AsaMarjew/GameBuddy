@@ -248,7 +248,7 @@ async function renderZoeken(req, res) {
             undiscoveredUsers.splice(i, 1);
           }
         }
-        
+
         res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
         db.close();
       });
@@ -683,7 +683,8 @@ function handleVerwijderen(req, res) {
           from: 'gamebuddyteamtech@gmail.com',
           to: req.session.userId.email,
           subject: 'Game Buddy App - Accountwijziging',
-          text: 'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
+          text:
+            'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
           attachments: [
             {
               filename: 'Logo.png',
@@ -695,14 +696,14 @@ function handleVerwijderen(req, res) {
 
         mailer(mailOptions);
         collection.deleteMany({ email: verwijderemail });
-        res.redirect('/index');
+        req.session.destroy();
+        res.redirect('/');
       } else {
         res.redirect('/emailbericht');
       }
     });
   });
 }
-
 
 // Functie die mail opties meekrijgt en alleen de mail verstuurd naar de gebruiker
 function mailer(Optie) {

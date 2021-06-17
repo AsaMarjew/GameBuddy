@@ -761,7 +761,8 @@ footer section a {
 }
 
 #inlog-form input[type='submit']:hover,
-#gameform input[type='submit']:hover {
+#gameform input[type='submit']:hover,
+.verButton:hover {
   background-color: var(--wit);
   transition: 0.5s ease-in-out;
   color: var(--geel);
