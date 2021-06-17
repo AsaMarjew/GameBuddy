@@ -490,7 +490,7 @@ footer section a {
   text-align: center;
   background-color: var(--grijs);
   max-width: 600px;
-  height: 100%;
+  height: 75%;
 }
 
 #filteren span {
@@ -760,6 +760,13 @@ footer section a {
   margin-bottom: 80px;
 }
 
+#inlog-form input[type='submit']:hover,
+#gameform input[type='submit']:hover {
+  background-color: var(--wit);
+  transition: 0.5s ease-in-out;
+  color: var(--geel);
+}
+
 /* Uitloggen knop */
 .uitloggen {
   margin: auto;
@@ -775,6 +782,12 @@ footer section a {
   cursor: pointer;
   margin-top: 30px;
   margin-bottom: 80px;
+}
+
+.uitloggen:hover {
+  background-color: var(--geel);
+  color: var(--grijs);
+  transition: 0.5s ease-in-out;
 }
 
 .dashboard {
@@ -797,4 +810,10 @@ footer section a {
 
 .footer section a:first-of-type {
   display: none;
+}
+
+.btn-aanmelden:hover {
+  background-color: var(--geel);
+  zoom: 1.02;
+  transition: 0.5s ease-in;
 }

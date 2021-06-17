@@ -248,7 +248,7 @@ async function renderZoeken(req, res) {
             undiscoveredUsers.splice(i, 1);
           }
         }
-
+        
         res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
         db.close();
       });
@@ -526,7 +526,8 @@ async function handleAanmelden(req, res) {
             from: 'gamebuddyteamtech@gmail.com',
             to: email,
             subject: 'Game Buddy App - Welkom gamer!',
-            text: 'Leuk dat je een Game Buddy account hebt aangemaakt! Veel game plezier!',
+            text:
+              'Leuk dat je een Game Buddy account hebt aangemaakt! Veel game plezier!',
             attachments: [
               {
                 filename: 'Logo.png',
@@ -701,6 +702,7 @@ function handleVerwijderen(req, res) {
     });
   });
 }
+
 
 // Functie die mail opties meekrijgt en alleen de mail verstuurd naar de gebruiker
 function mailer(Optie) {
