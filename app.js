@@ -242,6 +242,13 @@ async function renderZoeken(req, res) {
           return !user.favorieten.includes(gebruiker.email);
         });
 
+        // haal je eigen profiel uit undiscovered users
+        for (let i = 0; i < undiscoveredUsers.length; i++) {
+          if (undiscoveredUsers[i].email === user.email) {
+            undiscoveredUsers.splice(i, 1);
+          }
+        }
+
         res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
         db.close();
       });
