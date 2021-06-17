@@ -155,13 +155,23 @@ app.get('/verwijderen', (req, res) => {
   }
 });
 
-// Weergave van de verwijdernotfound pagina
+// Weergave van de pagina email komt niet overeen
 app.get('/emailbericht', (req, res) => {
   let { userId } = req.session;
   if (!userId) {
     res.render('index');
   } else {
     res.render('emailbericht');
+  }
+});
+
+// Weergave van de account is gewijzigd pagina
+app.get('/wijzigenbericht', (req, res) => {
+  let { userId } = req.session;
+  if (!userId) {
+    res.render('index');
+  } else {
+    res.render('wijzigenbericht');
   }
 });
 
@@ -587,7 +597,7 @@ async function handleWijzigen(req, res) {
 
               mailer(mailOptions);
               db.close();
-              res.redirect('/dashboard');
+              res.redirect('/wijzigenbericht');
             })
             .catch(err => {
               console.log(err);
@@ -634,7 +644,7 @@ async function handleWijzigen(req, res) {
 
               mailer(mailOptions);
               db.close();
-              res.redirect('/dashboard');
+              res.redirect('/wijzigenbericht');
             })
             .catch(err => {
               console.log(err);
