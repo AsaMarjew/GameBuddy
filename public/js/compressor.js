@@ -30,7 +30,7 @@ function compress() {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height);
 
-      // converteer de content van het canvas naar image url met bestandstype jpeg en een compressie qualiteit van 1
+      // converteer de content van het canvas naar image url met bestandstype jpeg en een compressie kwaliteit van 1
       const srcEncoded = ctx.canvas.toDataURL('image/jpeg', 1);
       const imgOutput = document.getElementById('imgOutput');
       imgOutput.value = srcEncoded;
