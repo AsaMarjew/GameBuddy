@@ -242,41 +242,39 @@ app.post('/verwijderen', handleRemove);
 // -- routing functions --
 
 async function renderZoeken(req, res) {
-    let { userId } = req.session;
-    if (!userId) {
-      res.redirect('inloggen');
-    } else {
-        try {
-    const client = new MongoClient(uri, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    });
+  let { userId } = req.session;
+  if (!userId) {
+    res.redirect('inloggen');
+  } else {
+    try {
+      const client = new MongoClient(uri, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+      });
       client.connect(async (err, db) => {
-      if (err) throw err;
+        if (err) throw err;
 
-      const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+        const gebruikersCol = db.db('TechTeam').collection('gebruikers');
 
-      // haal de huidige gebruiker op en een array van alle gebruikers
-      let users = await gebruikersCol.find().toArray();
-      const user = await gebruikersCol.findOne({
-        email: req.session.userId.email,
+        // haal de huidige gebruiker op en een array van alle gebruikers
+        let users = await gebruikersCol.find().toArray();
+        const user = await gebruikersCol.findOne({
+          email: req.session.userId.email,
+        });
+
+        // maak nieuwe array waar opgeslagen gebruikers niet instaan
+        let undiscoveredUsers = users.filter(gebruiker => {
+          return !user.favorieten.includes(gebruiker.email);
+        });
+
+        res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
+        db.close();
       });
-
-      // maak nieuwe array waar opgeslagen gebruikers niet instaan
-      let undiscoveredUsers = users.filter(gebruiker => {
-        return !user.favorieten.includes(gebruiker.email);
-      });
-
-      res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
-      db.close();
-    });
-  } catch (err) {
-    console.log(err);
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
-}
-
-
 
 function renderFavorieten(req, res) {
   const client = new MongoClient(uri, {
@@ -290,29 +288,29 @@ function renderFavorieten(req, res) {
     client.connect((err, db) => {
       if (err) throw err;
 
-  // haal huidige gebruiker op
-    const gebruikersCol = db.db('TechTeam').collection('gebruikers');
-    gebruikersCol
-      .findOne({ email: req.session.userId.email })
-      .then(gebruiker => {
-        let users = [];
-        // push alle favorieten gebruikers in een array
-        gebruiker.favorieten.forEach(email => {
-          users.push(gebruikersCol.findOne({ email: email }));
-        });
-
-        // nadat alle gebruikers in de user array zitten => render pagina
-        Promise.all(users)
-          .then(data => {
-            res.render('favorieten', { gebruikersLijst: data });
-            db.close();
-          })
-          .catch(err => {
-            console.log(err);
+      // haal huidige gebruiker op
+      const gebruikersCol = db.db('TechTeam').collection('gebruikers');
+      gebruikersCol
+        .findOne({ email: req.session.userId.email })
+        .then(gebruiker => {
+          let users = [];
+          // push alle favorieten gebruikers in een array
+          gebruiker.favorieten.forEach(email => {
+            users.push(gebruikersCol.findOne({ email: email }));
           });
-      });
-  });
-}
+
+          // nadat alle gebruikers in de user array zitten => render pagina
+          Promise.all(users)
+            .then(data => {
+              res.render('favorieten', { gebruikersLijst: data });
+              db.close();
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        });
+    });
+  }
 }
 
 async function renderApi(req, res) {
@@ -546,7 +544,8 @@ async function handleAanmelden(req, res) {
             from: 'gamebuddyteamtech@gmail.com',
             to: email,
             subject: 'Game Buddy App - Welkom gamer!',
-            text: 'Leuk dat je een Game Buddy account hebt aangemaakt! Veel game plezier!',
+            text:
+              'Leuk dat je een Game Buddy account hebt aangemaakt! Veel game plezier!',
             attachments: [
               {
                 filename: 'Logo.png',
@@ -648,7 +647,8 @@ function handleRemove(req, res) {
             from: 'gamebuddyteamtech@gmail.com',
             to: email,
             subject: 'Game Buddy App - Accountwijziging',
-            text: 'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
+            text:
+              'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
             attachments: [
               {
                 filename: 'Logo.png',
