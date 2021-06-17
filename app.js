@@ -167,12 +167,7 @@ app.get('/emailbericht', (req, res) => {
 
 // Weergave van de account is gewijzigd pagina
 app.get('/wijzigenbericht', (req, res) => {
-  let { userId } = req.session;
-  if (!userId) {
-    res.render('index');
-  } else {
-    res.render('wijzigenbericht');
-  }
+  res.render('wijzigenbericht');
 });
 
 //tutorial route
@@ -597,6 +592,7 @@ async function handleWijzigen(req, res) {
 
               mailer(mailOptions);
               db.close();
+              req.session.destroy();
               res.redirect('/wijzigenbericht');
             })
             .catch(err => {
@@ -644,6 +640,7 @@ async function handleWijzigen(req, res) {
 
               mailer(mailOptions);
               db.close();
+              req.session.destroy();
               res.redirect('/wijzigenbericht');
             })
             .catch(err => {
