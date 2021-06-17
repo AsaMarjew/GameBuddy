@@ -155,44 +155,19 @@ app.get('/verwijderen', (req, res) => {
   }
 });
 
-// Weergave van de verwijdercheck pagina
-app.get('/verwijderencheck', (req, res) => {
+// Weergave van de pagina email komt niet overeen
+app.get('/emailbericht', (req, res) => {
   let { userId } = req.session;
   if (!userId) {
     res.render('index');
   } else {
-    res.render('verwijderencheck');
+    res.render('emailbericht');
   }
 });
 
-// Weergave van de verwijderbericht pagina
-app.get('/verwijderenbericht', (req, res) => {
-  let { userId } = req.session;
-  if (!userId) {
-    res.render('index');
-  } else {
-    res.render('verwijderenbericht');
-  }
-});
-
-// Weergave van de verwijdernotfound pagina
-app.get('/verwijderennotfound', (req, res) => {
-  let { userId } = req.session;
-  if (!userId) {
-    res.render('index');
-  } else {
-    res.render('verwijderennotfound');
-  }
-});
-
-// Weergave van de wijzigenbericht pagina
+// Weergave van de account is gewijzigd pagina
 app.get('/wijzigenbericht', (req, res) => {
-  let { userId } = req.session;
-  if (!userId) {
-    res.render('index');
-  } else {
-    res.render('wijzigenbericht');
-  }
+  res.render('wijzigenbericht');
 });
 
 //tutorial route
@@ -234,10 +209,10 @@ app.post('/favorieten', handleFavorietenVerwijderen);
 app.post('/aanmelden', upload.single('image'), handleAanmelden);
 
 // Wijzigen post
-app.post('/wijzigen', uploadWijzig.single('wijzigimage'), handleUpdate);
+app.post('/wijzigen', uploadWijzig.single('wijzigimage'), handleWijzigen);
 
 // Verwijderen post
-app.post('/verwijderen', handleRemove);
+app.post('/verwijderen', handleVerwijderen);
 
 // -- routing functions --
 
@@ -267,6 +242,13 @@ async function renderZoeken(req, res) {
           return !user.favorieten.includes(gebruiker.email);
         });
 
+        // haal je eigen profiel uit undiscovered users
+        for (let i = 0; i < undiscoveredUsers.length; i++) {
+          if (undiscoveredUsers[i].email === user.email) {
+            undiscoveredUsers.splice(i, 1);
+          }
+        }
+        
         res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
         db.close();
       });
@@ -562,47 +544,146 @@ async function handleAanmelden(req, res) {
   });
 }
 
-// De functie handleUpdate zorgt ervoor dat een account gewijzigd kan worden op basis van de ingevoerde email.
+// De functie handleWijzigen zorgt ervoor dat een account gewijzigd kan worden op basis van de ingevoerde email.
 // De document gegevens worden geheel gewijzigd in de database.
-async function handleUpdate(req, res) {
+async function handleWijzigen(req, res) {
   const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
 
-  const email = req.body.wijzigemail;
+  const wijzigemail = req.body.wijzigemail;
 
   client.connect((err, db) => {
     if (err) throw err;
-    db.db('TechTeam')
-      .collection('gebruikers')
-      .findOneAndUpdate(
-        { email: email },
-        {
-          $set: {
-            naam: req.body.wijzignaam,
-            leeftijd: req.body.wijzigleeftijd,
-            email: req.body.wijzigemail,
-            wachtwoord: req.body.wijzigwachtwoordaanmelden,
-            telefoon: req.body.wijzigtelefoon,
-            console: req.body.wijzigconsole,
-            bio: req.body.wijzigbio,
-            game1: req.body.wijziggame1,
-            game2: req.body.wijziggame2,
-            game3: req.body.wijziggame3,
-            game4: req.body.wijziggame4,
-            img: req.file.filename,
-          },
+    const collection = db.db('TechTeam').collection('gebruikers');
+    collection.findOne({ email: req.session.userId.email }, function () {
+      if (req.session.userId.email === wijzigemail) {
+        if (req.body.img) {
+          collection
+            .findOneAndUpdate(
+              { email: wijzigemail },
+              {
+                $set: {
+                  naam: req.body.wijzignaam,
+                  leeftijd: req.body.wijzigleeftijd,
+                  email: req.body.wijzigemail,
+                  wachtwoord: req.body.wijzigwachtwoord,
+                  telefoon: req.body.wijzigtelefoon,
+                  console: req.body.wijzigconsole,
+                  bio: req.body.wijzigbio,
+                  game1: req.body.wijziggame1,
+                  game2: req.body.wijziggame2,
+                  game3: req.body.wijziggame3,
+                  game4: req.body.wijziggame4,
+                  img: req.body.img,
+                  favorieten: [],
+                },
+              }
+            )
+            .then(() => {
+              // mailOptions maakt de variabele aan met alle opties die nodig zijn voor het verzenden van een mail.
+              // Vervolgens wordt het door de funtie mailer verzonden.
+              const mailOptions = {
+                from: 'gamebuddyteamtech@gmail.com',
+                to: req.session.userId.email,
+                subject: 'Game Buddy App - Accountwijziging',
+                text: 'Je Game Buddy account is gewijzigd!',
+                attachments: [
+                  {
+                    filename: 'Logo.png',
+                    path: __dirname + '/public/img/logo.ico',
+                    cid: 'logo',
+                  },
+                ],
+              };
+
+              mailer(mailOptions);
+              db.close();
+              req.session.destroy();
+              res.redirect('/wijzigenbericht');
+            })
+            .catch(err => {
+              console.log(err);
+              res.redirect('/error');
+            });
+        } else {
+          collection
+            .findOneAndUpdate(
+              { email: wijzigemail },
+              {
+                $set: {
+                  naam: req.body.wijzignaam,
+                  leeftijd: req.body.wijzigleeftijd,
+                  email: req.body.wijzigemail,
+                  wachtwoord: req.body.wijzigwachtwoord,
+                  telefoon: req.body.wijzigtelefoon,
+                  console: req.body.wijzigconsole,
+                  bio: req.body.wijzigbio,
+                  game1: req.body.wijziggame1,
+                  game2: req.body.wijziggame2,
+                  game3: req.body.wijziggame3,
+                  game4: req.body.wijziggame4,
+                  img: `uploads/${req.file.filename}`,
+                  favorieten: [],
+                },
+              }
+            )
+            .then(() => {
+              // mailOptions maakt de variabele aan met alle opties die nodig zijn voor het verzenden van een mail.
+              // Vervolgens wordt het door de funtie mailer verzonden.
+              const mailOptions = {
+                from: 'gamebuddyteamtech@gmail.com',
+                to: req.session.userId.email,
+                subject: 'Game Buddy App - Accountwijziging',
+                text: 'Je Game Buddy account is gewijzigd!',
+                attachments: [
+                  {
+                    filename: 'Logo.png',
+                    path: __dirname + '/public/img/logo.ico',
+                    cid: 'logo',
+                  },
+                ],
+              };
+
+              mailer(mailOptions);
+              db.close();
+              req.session.destroy();
+              res.redirect('/wijzigenbericht');
+            })
+            .catch(err => {
+              console.log(err);
+              res.redirect('/error');
+            });
         }
-      )
-      .then(() => {
+      } else {
+        res.redirect('/emailbericht');
+      }
+    });
+  });
+}
+
+//  Met de functie handleVerwijderen worden documenten verwijderd uit de database.
+//  Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.
+function handleVerwijderen(req, res) {
+  const client = new MongoClient(uri, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  const verwijderemail = req.body.verwijderemail;
+
+  client.connect((err, db) => {
+    const collection = db.db('TechTeam').collection('gebruikers');
+    collection.findOne({ email: req.session.userId.email }, function () {
+      if (req.session.userId.email === verwijderemail) {
         // mailOptions maakt de variabele aan met alle opties die nodig zijn voor het verzenden van een mail.
         // Vervolgens wordt het door de funtie mailer verzonden.
         const mailOptions = {
           from: 'gamebuddyteamtech@gmail.com',
-          to: email,
+          to: req.session.userId.email,
           subject: 'Game Buddy App - Accountwijziging',
-          text: 'Je Game Buddy account is gewijzigd!',
+          text: 'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
           attachments: [
             {
               filename: 'Logo.png',
@@ -613,58 +694,15 @@ async function handleUpdate(req, res) {
         };
 
         mailer(mailOptions);
-        db.close();
-        res.redirect('/wijzigenbericht');
-      })
-      .catch(err => {
-        console.log(err);
-        res.redirect('/error');
-      });
+        collection.deleteMany({ email: verwijderemail });
+        res.redirect('/index');
+      } else {
+        res.redirect('/emailbericht');
+      }
+    });
   });
 }
 
-//  Met de functie verwijderen worden documenten verwijderd uit de database.
-//  Dit wordt gedaan met findOneAndDelete waarbij het object verwijderd wordt aan de hand van de email van de gebruiker.
-function handleRemove(req, res) {
-  const client = new MongoClient(uri, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
-
-  const email = req.body.verwijderemail;
-
-  client.connect((err, db) => {
-    const collection = db.db('TechTeam').collection('gebruikers');
-    collection
-      .find({ email: email }, { $exists: true })
-      .toArray(function (err, doc) {
-        if (doc.length === 0) {
-          res.redirect('/verwijderennotfound');
-        } else if (doc) {
-          // mailOptions maakt de variabele aan met alle opties die nodig zijn voor het verzenden van een mail.
-          // Vervolgens wordt het door de funtie mailer verzonden.
-          const mailOptions = {
-            from: 'gamebuddyteamtech@gmail.com',
-            to: email,
-            subject: 'Game Buddy App - Accountwijziging',
-            text:
-              'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
-            attachments: [
-              {
-                filename: 'Logo.png',
-                path: __dirname + '/public/img/logo.ico',
-                cid: 'logo',
-              },
-            ],
-          };
-
-          mailer(mailOptions);
-          collection.deleteMany({ email: email });
-          res.redirect('/verwijderenbericht');
-        }
-      });
-  });
-}
 
 // Functie die mail opties meekrijgt en alleen de mail verstuurd naar de gebruiker
 function mailer(Optie) {
@@ -702,7 +740,7 @@ function renderDashboard(req, res) {
 
       db.db('TechTeam')
         .collection('gebruikers')
-        .findOne({ naam: req.session.naam })
+        .findOne({ email: req.session.email })
         .then(() => {
           res.render('dashboard', { gebruikersLijst: req.session.userId });
           db.close();

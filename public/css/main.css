@@ -61,7 +61,7 @@ main {
 }
 
 main::-webkit-scrollbar,
-.fortnite section {
+.fortnite section::-webkit-scrollbar {
   display: none;
 }
 
@@ -382,6 +382,8 @@ footer section a {
   background-color: #232323;
   border: none;
   border-radius: 5px;
+  color: var(--geel);
+  font-size: 2em;
 }
 
 .card .favorietenButton + svg {
@@ -446,11 +448,8 @@ footer section a {
 /* EINDE CARD */
 
 /* BEGIN ZOEKEN */
-#zoeken-wrapper {
-  position: absolute;
-}
-
-#zoeken-menu {
+#zoeken-menu,
+#dashboard-menu {
   color: var(--geel);
   font-size: 1.5em;
   cursor: pointer;
@@ -462,7 +461,11 @@ footer section a {
   display: flex;
 }
 
-#zoeken-menu span {
+#zoeken-menu {
+  margin-left: 480px;
+}
+
+#dashboard-menu span {
   position: relative;
   flex-basis: 33%;
   margin-left: 10px;
@@ -597,11 +600,19 @@ footer section a {
   top: -150px;
 }
 
-#fortniteknop a img {
+#fortniteknop-home {
+  position: fixed;
+  top: -40px;
+  margin-left: 440px;
+}
+
+#fortniteknop a img,
+#fortniteknop-home a img {
   border-radius: 50px;
 }
 
-#fortniteknop p {
+#fortniteknop p,
+#fortniteknop-home p {
   padding: 0px;
   margin: 0px;
   width: 100%;
