@@ -242,6 +242,13 @@ async function renderZoeken(req, res) {
           return !user.favorieten.includes(gebruiker.email);
         });
 
+        // haal je eigen profiel uit undiscovered users
+        for (let i = 0; i < undiscoveredUsers.length; i++) {
+          if (undiscoveredUsers[i].email === user.email) {
+            undiscoveredUsers.splice(i, 1);
+          }
+        }
+
         res.render('zoeken', { gebruikersLijst: undiscoveredUsers });
         db.close();
       });
@@ -519,7 +526,8 @@ async function handleAanmelden(req, res) {
             from: 'gamebuddyteamtech@gmail.com',
             to: email,
             subject: 'Game Buddy App - Welkom gamer!',
-            text: 'Leuk dat je een Game Buddy account hebt aangemaakt! Veel game plezier!',
+            text:
+              'Leuk dat je een Game Buddy account hebt aangemaakt! Veel game plezier!',
             attachments: [
               {
                 filename: 'Logo.png',
@@ -675,7 +683,8 @@ function handleVerwijderen(req, res) {
           from: 'gamebuddyteamtech@gmail.com',
           to: req.session.userId.email,
           subject: 'Game Buddy App - Accountwijziging',
-          text: 'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
+          text:
+            'Je Game Buddy account is verwijderd! Maak hier opnieuw een account aan ->',
           attachments: [
             {
               filename: 'Logo.png',
@@ -687,7 +696,8 @@ function handleVerwijderen(req, res) {
 
         mailer(mailOptions);
         collection.deleteMany({ email: verwijderemail });
-        res.redirect('/index');
+        req.session.destroy();
+        res.redirect('/');
       } else {
         res.redirect('/emailbericht');
       }

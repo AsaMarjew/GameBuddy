@@ -61,7 +61,7 @@ main {
 }
 
 main::-webkit-scrollbar,
-.fortnite section {
+.fortnite section::-webkit-scrollbar {
   display: none;
 }
 
@@ -382,6 +382,8 @@ footer section a {
   background-color: #232323;
   border: none;
   border-radius: 5px;
+  color: var(--geel);
+  font-size: 2em;
 }
 
 .card .favorietenButton + svg {
@@ -446,11 +448,8 @@ footer section a {
 /* EINDE CARD */
 
 /* BEGIN ZOEKEN */
-#zoeken-wrapper {
-  position: absolute;
-}
-
-#zoeken-menu {
+#zoeken-menu,
+#dashboard-menu {
   color: var(--geel);
   font-size: 1.5em;
   cursor: pointer;
@@ -462,7 +461,11 @@ footer section a {
   display: flex;
 }
 
-#zoeken-menu span {
+#zoeken-menu {
+  margin-left: 480px;
+}
+
+#dashboard-menu span {
   position: relative;
   flex-basis: 33%;
   margin-left: 10px;
@@ -487,7 +490,7 @@ footer section a {
   text-align: center;
   background-color: var(--grijs);
   max-width: 600px;
-  height: 100%;
+  height: 75%;
 }
 
 #filteren span {
@@ -597,11 +600,19 @@ footer section a {
   top: -150px;
 }
 
-#fortniteknop a img {
+#fortniteknop-home {
+  position: fixed;
+  top: -40px;
+  margin-left: 440px;
+}
+
+#fortniteknop a img,
+#fortniteknop-home a img {
   border-radius: 50px;
 }
 
-#fortniteknop p {
+#fortniteknop p,
+#fortniteknop-home p {
   padding: 0px;
   margin: 0px;
   width: 100%;
@@ -749,6 +760,14 @@ footer section a {
   margin-bottom: 80px;
 }
 
+#inlog-form input[type='submit']:hover,
+#gameform input[type='submit']:hover,
+.verButton:hover {
+  background-color: var(--wit);
+  transition: 0.5s ease-in-out;
+  color: var(--geel);
+}
+
 /* Uitloggen knop */
 .uitloggen {
   margin: auto;
@@ -766,11 +785,17 @@ footer section a {
   margin-bottom: 80px;
 }
 
+.uitloggen:hover {
+  background-color: var(--geel);
+  color: var(--grijs);
+  transition: 0.5s ease-in-out;
+}
+
 .dashboard {
   color: #fff;
 }
 
-.btn-aanmelden {
+.btn-registreren {
   margin-top: 10px;
   display: inline-block;
   padding: 10px 90px;
@@ -786,4 +811,10 @@ footer section a {
 
 .footer section a:first-of-type {
   display: none;
+}
+
+.btn-aanmelden:hover {
+  background-color: var(--geel);
+  zoom: 1.02;
+  transition: 0.5s ease-in;
 }
