@@ -575,6 +575,7 @@ footer section a {
 /* BEGIN VERWIJDERENBERICHT PAGINA */
 .verButton {
   margin: auto;
+  width: 30%;
   display: flex;
   padding: 10px 90px;
   border-radius: 25px;
@@ -584,6 +585,9 @@ footer section a {
   letter-spacing: 2px;
   cursor: pointer;
   margin-top: 30px;
+  color: black;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .verTekst {
